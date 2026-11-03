@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environment
+.venv/
+venv/
+
+# Organisation data files created by `riskid init` and the reference pack
+*.riskid
+
+# Test and tooling
+.pytest_cache/
+.coverage
+htmlcov/
