@@ -345,3 +345,14 @@ def test_actor_falls_back_when_the_account_has_no_name(monkeypatch):
     assert config.default_actor() == config.UNKNOWN_ACTOR
     monkeypatch.setenv("RISKID_ACTOR", "Ann Other")
     assert config.default_actor() == "Ann Other"
+
+
+def test_every_interface_mode_never_allows_any_host():
+    from riskid.cli import _allowed_hosts
+
+    allowed = _allowed_hosts("0.0.0.0")
+    assert "*" not in allowed
+    assert "127.0.0.1" in allowed and "localhost" in allowed
+    assert "evil.example" not in allowed
+    assert _allowed_hosts("127.0.0.1") == ["127.0.0.1", "localhost"]
+    assert _allowed_hosts("192.168.1.20") == ["127.0.0.1", "localhost", "192.168.1.20"]

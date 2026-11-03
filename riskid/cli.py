@@ -41,14 +41,28 @@ def _cmd_rebuild(path: str) -> int:
 
 
 def _allowed_hosts(host: str):
-    """The Host header values to accept: loopback, plus the host served on if it is another."""
+    """The Host header values to accept: loopback, plus the host served on if it is another.
+
+    On every interface (0.0.0.0 or ::) the list is loopback plus this machine's
+    own names and addresses, never "*": a wildcard would let a web page reach
+    the workbench through DNS rebinding, with an Origin that matches its Host.
+    """
+    import socket
+
     from riskid.web import LOOPBACK_HOSTS
 
-    if host in ("0.0.0.0", "::"):
-        print("warning: serving on every network interface; anyone who can reach "
-              "this machine can read and change the organisation file", file=sys.stderr)
-        return ["*"]
-    return list(LOOPBACK_HOSTS) + ([host] if host not in LOOPBACK_HOSTS else [])
+    if host not in ("0.0.0.0", "::"):
+        return list(LOOPBACK_HOSTS) + ([host] if host not in LOOPBACK_HOSTS else [])
+    names = {socket.gethostname(), socket.getfqdn()}
+    try:
+        names |= {info[4][0] for info in socket.getaddrinfo(socket.gethostname(), None)}
+    except OSError:
+        pass
+    allowed = list(LOOPBACK_HOSTS) + sorted(n for n in names if n and n not in LOOPBACK_HOSTS)
+    print("warning: serving on every network interface; anyone who can reach this "
+          "machine can read and change the organisation file. Accepted host names: "
+          + ", ".join(allowed), file=sys.stderr)
+    return allowed
 
 
 def _cmd_serve(path: str, host: str, port: int, open_browser: bool) -> int:
