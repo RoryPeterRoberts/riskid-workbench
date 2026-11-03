@@ -1,0 +1,91 @@
+{
+  "FIN": {
+    "name": "Financial Impact",
+    "levels": [
+      {"score": 1, "rating": "Incidental", "description": "Less than 0.1% of annual revenue or budget"},
+      {"score": 2, "rating": "Minor", "description": "0.1\u20131%"},
+      {"score": 3, "rating": "Moderate", "description": "1\u20135%"},
+      {"score": 4, "rating": "Major", "description": "5\u201315%"},
+      {"score": 5, "rating": "Extreme", "description": "More than 15%, or threatens the viability of the organisation"}
+    ]
+  },
+  "REG": {
+    "name": "Regulatory and Legal Impact",
+    "levels": [
+      {"score": 1, "rating": "Incidental", "description": "No regulatory or legal impact"},
+      {"score": 2, "rating": "Minor", "description": "Informal regulator feedback, minor findings, individual complaints resolved"},
+      {"score": 3, "rating": "Moderate", "description": "Formal investigation or enforcement warning, claims by individuals"},
+      {"score": 4, "rating": "Major", "description": "Formal enforcement action, significant fines, restrictions on activities, an order to stop or withdraw a system, a claim by a group of affected persons"},
+      {"score": 5, "rating": "Extreme", "description": "Withdrawal of authorisation, criminal prosecution, penalties in the highest tier of Article 99, or the same breach established against every person the system has decided about"}
+    ]
+  },
+  "REP": {
+    "name": "Reputational Impact",
+    "levels": [
+      {"score": 1, "rating": "Incidental", "description": "No external coverage"},
+      {"score": 2, "rating": "Minor", "description": "Limited trade or local press, quickly contained"},
+      {"score": 3, "rating": "Moderate", "description": "National press coverage, sustained for days"},
+      {"score": 4, "rating": "Major", "description": "International press, sustained coverage, loss of key customer or partner relationships"},
+      {"score": 5, "rating": "Extreme", "description": "Total loss of public confidence, departure of the board or chief executive, sustained international coverage"}
+    ]
+  },
+  "IND": {
+    "name": "Harm to Individuals",
+    "levels": [
+      {"score": 1, "rating": "Incidental", "description": "None"},
+      {"score": 2, "rating": "Minor", "description": "Inconvenience"},
+      {"score": 3, "rating": "Moderate", "description": "Material and reversible detriment to some individuals"},
+      {"score": 4, "rating": "Major", "description": "Serious or irreversible harm to some individuals, or material harm to many"},
+      {"score": 5, "rating": "Extreme", "description": "Death, mass harm, or loss of fundamental rights at scale"}
+    ]
+  },
+  "OPS": {
+    "name": "Customer and Operational Impact",
+    "levels": [
+      {"score": 1, "rating": "Incidental", "description": "Negligible disruption, no customer impact"},
+      {"score": 2, "rating": "Minor", "description": "Limited disruption, minimal customer impact"},
+      {"score": 3, "rating": "Moderate", "description": "Significant disruption, noticeable degradation of service"},
+      {"score": 4, "rating": "Major", "description": "Major service disruption, large-scale customer impact, material complaints"},
+      {"score": 5, "rating": "Extreme", "description": "Total service failure, mass customer harm, systemic operational breakdown"}
+    ]
+  },
+  "likelihood": {
+    "name": "Likelihood",
+    "levels": [
+      {"score": 1, "rating": "Rare", "description": "Less than 1%"},
+      {"score": 2, "rating": "Unlikely", "description": "1\u201310%"},
+      {"score": 3, "rating": "Possible", "description": "10\u201350%"},
+      {"score": 4, "rating": "Likely", "description": "50\u201390%"},
+      {"score": 5, "rating": "Frequent", "description": "More than 90%, or already occurring"}
+    ]
+  },
+  "vulnerability": {
+    "name": "Vulnerability",
+    "levels": [
+      {"score": 1, "rating": "Very Low", "description": "Robust controls, tested under stress"},
+      {"score": 2, "rating": "Low", "description": "Adequate controls, minor gaps"},
+      {"score": 3, "rating": "Medium", "description": "Controls exist, with known weaknesses or untested elements"},
+      {"score": 4, "rating": "High", "description": "Material control gaps, limited resilience"},
+      {"score": 5, "rating": "Very High", "description": "No effective controls, fully exposed"}
+    ]
+  },
+  "speed": {
+    "name": "Speed of Onset",
+    "levels": [
+      {"score": 1, "rating": "Very Slow", "description": "Years"},
+      {"score": 2, "rating": "Slow", "description": "Quarters"},
+      {"score": 3, "rating": "Moderate", "description": "Months"},
+      {"score": 4, "rating": "Fast", "description": "Weeks"},
+      {"score": 5, "rating": "Immediate", "description": "Days or less"}
+    ]
+  },
+  "data_quality": {
+    "name": "Data Quality",
+    "levels": [
+      {"rating": "High", "basis": "Measurements on the organisation's own system and data, or an extensive public record"},
+      {"rating": "Medium", "basis": "Limited measurement plus structured expert judgement, such as partial test results or checked vendor documentation"},
+      {"rating": "Low", "basis": "Mainly expert judgement or the supplier's own claims, such as workshops or vendor benchmarks not reproduced on your data"},
+      {"rating": "Very Low", "basis": "Speculative, with no relevant data or precedent, as with agentic and novel uses"}
+    ]
+  }
+}

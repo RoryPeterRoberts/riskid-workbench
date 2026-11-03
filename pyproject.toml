@@ -29,5 +29,10 @@ riskid = "riskid.cli:main"
 [tool.setuptools]
 packages = ["riskid"]
 
+# The data packs ship as data files inside the package (SPEC.md section 9);
+# declare them so a non-editable install (pipx) keeps the importers working.
+[tool.setuptools.package-data]
+riskid = ["data/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
