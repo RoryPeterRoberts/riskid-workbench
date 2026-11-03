@@ -135,9 +135,16 @@ def test_check_use_case_negative():
 # Three failing-field checks, each with a returned and an accepted example.
 
 def test_check_use_case_driver_returned_and_accepted():
-    # Returned: a stock driver phrase is sent back.
-    returned = check_use_case({"drivers": "model error"})
-    assert any("driver" in reason for reason in returned)
+    # Returned: each of the three stock phrases, in at least two casings,
+    # is sent back (case-insensitive match).
+    returned_casings = (
+        "model error", "Model Error",
+        "AI risk", "ai risk",
+        "the model is wrong", "THE MODEL IS WRONG",
+    )
+    for drivers in returned_casings:
+        reasons = check_use_case({"drivers": drivers})
+        assert any("driver" in reason for reason in reasons), drivers
     # Accepted: a concrete driver clears that check.
     accepted = check_use_case({"drivers": "a vendor pushed an unvalidated update"})
     assert not any("driver" in reason for reason in accepted)
@@ -203,20 +210,31 @@ def test_version_mismatch_negative():
 # --- pilot_overdue (SPEC.md 5.10) -----------------------------------------
 
 def test_pilot_overdue_positive():
-    system = System(pilot_end_date="2026-01-31")
-    assert pilot_overdue(system, "2026-06-30") is True
+    # Still in verification and validation after the end date: flagged.
+    assert pilot_overdue(
+        System(pilot_end_date="2026-01-31",
+               lifecycle_stage="verification and validation"),
+        "2026-06-30") is True
+    # Assessed during the pilot and still before deployment after the end
+    # date: the assessment does not clear the flag.
+    assert pilot_overdue(
+        System(pilot_end_date="2026-01-31",
+               lifecycle_stage="design and development",
+               last_risk_assessment={"date": "2026-01-31"}),
+        "2026-06-30") is True
 
 
 def test_pilot_overdue_negative():
-    # Not yet past the end date, and a recorded deployment gate, both clear
-    # the flag; no pilot end date never does.
-    assert pilot_overdue(
-        System(pilot_end_date="2026-09-30"), "2026-06-30") is False
+    # Moved to deployment: the gate decision has been made, so not flagged.
     assert pilot_overdue(
         System(pilot_end_date="2026-01-31",
-               last_risk_assessment={"date": "2026-01-31"}),
+               lifecycle_stage="deployment"),
         "2026-06-30") is False
-    assert pilot_overdue(System(), "2026-06-30") is False
+    # Before the end date: not flagged.
+    assert pilot_overdue(
+        System(pilot_end_date="2026-09-30",
+               lifecycle_stage="verification and validation"),
+        "2026-06-30") is False
 
 
 # --- ai_draft_quality (SPEC.md 5.9) ----------------------------------------

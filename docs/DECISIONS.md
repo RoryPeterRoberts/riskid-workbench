@@ -26,3 +26,10 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   environment and called, never run as a script; PyYAML is needed at import
   time there and is not added to the project). Only the golden file is
   committed, not the reference script or its private paths. 2026-11-03.
+- round 2: `pilot_overdue` flags a system when it has a `pilot_end_date` that
+  today is after and its `lifecycle_stage` is still before deployment — one
+  of inception, design and development, verification and validation. The
+  seven lifecycle stage names live in one constant, `LIFECYCLE_STAGES`.
+  Moving a system to deployment or later is the gate decision, so a pilot
+  that was risk-assessed but is still before deployment is still flagged.
+  2026-11-03.

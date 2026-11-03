@@ -18,8 +18,9 @@ import re
 # dimension that reaches the maximum is named), so the result is deterministic.
 DIM_ORDER = ("FIN", "REG", "REP", "IND", "OPS")
 
-# Stock driver phrases that a B.2 submission must not use (SPEC.md 5.5).
-STOCK_DRIVER_PHRASES = ("model error", "AI risk", "the model is wrong")
+# Stock driver phrases that a B.2 submission must not use (SPEC.md 5.5),
+# stored lower-cased so the driver text can be matched case-insensitively.
+STOCK_DRIVER_PHRASES = ("model error", "ai risk", "the model is wrong")
 
 # Control names that, when present, must carry an override figure in their
 # evidence (SPEC.md 5.5, "human in the loop" / "human oversight").
@@ -29,6 +30,22 @@ _HUMAN_CONTROL_NAMES = ("human in the loop", "human oversight")
 # score (SPEC.md 5.3).
 _FLAG_MATERIAL_ON_IMPACT_ALONE = "material_on_impact_alone"
 _FLAG_PROHIBITED_PRACTICE = "prohibited_practice"
+
+# The seven lifecycle stages the library's ``lifecycle`` column uses
+# (SPEC.md 4 System.lifecycle_stage), in order.
+LIFECYCLE_STAGES = (
+    "inception",
+    "design and development",
+    "verification and validation",
+    "deployment",
+    "operation and monitoring",
+    "re-evaluation",
+    "retirement",
+)
+
+# Stages before deployment: a pilot still in one of these has not passed its
+# gate (SPEC.md 5.10). Moving to deployment or later is the gate decision.
+_STAGES_BEFORE_DEPLOYMENT = LIFECYCLE_STAGES[:3]
 
 
 def _field(obj, name, default=None):
@@ -212,21 +229,24 @@ def version_mismatch(system):
 
 
 def pilot_overdue(system, today):
-    """Whether a system is past its pilot end date with no gate record.
+    """Whether a pilot is past its end date and still before deployment.
 
-    A system past its pilot end date without a deployment-gate record is
-    flagged (OPS-08, SPEC.md 5.10). A deployment-gate record is taken to be
-    a dated last risk assessment; systems that never ran a pilot (no end
-    date) are not overdue. ``pilot_end_date`` and ``today`` are ISO dates or
-    date objects.
+    A system is overdue when it has a ``pilot_end_date`` that ``today`` is
+    after, and its ``lifecycle_stage`` is still one of the stages before
+    deployment — inception, design and development, or verification and
+    validation (SPEC.md 5.10). Moving the system to deployment or later is
+    the gate decision, recorded like any other lifecycle change, so a system
+    already at deployment or beyond is not overdue even if it was assessed
+    during the pilot. Systems that never ran a pilot (no end date) are not
+    overdue. ``pilot_end_date`` and ``today`` are ISO dates or date objects.
     """
     end = _field(system, "pilot_end_date")
     if end is None:
         return False
-    gate = _field(system, "last_risk_assessment") or {}
-    if _field(gate, "date"):
+    if not _later(today, end):
         return False
-    return _later(today, end)
+    stage = str(_field(system, "lifecycle_stage") or "").strip().lower()
+    return stage in _STAGES_BEFORE_DEPLOYMENT
 
 
 def ai_draft_quality(field):
