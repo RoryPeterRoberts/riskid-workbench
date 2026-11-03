@@ -1,0 +1,43 @@
+l1_code	l1	l2_code	l2	owner_function
+DAT	Data	1.1	Training, validation and test data quality and representativeness	Data owner
+DAT	Data	1.2	Data provenance, rights and lawful basis for training data	Data owner / DPO
+DAT	Data	1.3	Run-time input data: drift, quality, missing fields, manipulation	Data owner / system owner
+DAT	Data	1.4	Data retention, minimisation and access within the AI system	Data owner / DPO
+MOD	Model and performance	2.1	Accuracy, error and fabrication (hallucination)	Model owner / validator
+MOD	Model and performance	2.2	Robustness, generalisation and edge cases	Model owner / validator
+MOD	Model and performance	2.3	Drift and degradation over time, including vendor model changes	Model owner
+MOD	Model and performance	2.4	Evaluation and validation gaps	Validator
+MOD	Model and performance	2.5	Technology readiness and capability limits (including agentic autonomy)	Model owner / CTO
+FAI	Fairness and discrimination	3.1	Biased outcomes against protected groups	Fairness / ethics lead
+FAI	Fairness and discrimination	3.2	Unequal performance across groups	Fairness / ethics lead
+FAI	Fairness and discrimination	3.3	Proxy discrimination and feedback loops	Fairness / ethics lead
+FAI	Fairness and discrimination	3.4	Toxic, offensive or demeaning content	Content / product owner
+TRA	Transparency, explainability and accountability	4.1	Opacity to affected persons	Customer / service owner
+TRA	Transparency, explainability and accountability	4.2	Opacity to the organisation	System owner
+TRA	Transparency, explainability and accountability	4.3	Accountability gaps	Governance / AI officer
+TRA	Transparency, explainability and accountability	4.4	Records, logging and audit-trail gaps	Records manager
+HUM	Human oversight and use	5.1	Automation bias and over-reliance	Business owner
+HUM	Human oversight and use	5.2	Use outside the intended purpose; foreseeable misuse	Business owner
+HUM	Human oversight and use	5.3	Operator competence and deskilling	HR / business owner
+HUM	Human oversight and use	5.4	Oversight design	Business owner
+HUM	Human oversight and use	5.5	Loss of agency, manipulation and dependence of users	Product owner
+SEC	Security and adversarial	6.1	Prompt injection and jailbreak	CISO
+SEC	Security and adversarial	6.2	Data and model poisoning	CISO / model owner
+SEC	Security and adversarial	6.3	Model theft, extraction and inference attacks	CISO
+SEC	Security and adversarial	6.4	Insecure output handling and excessive agency	CISO / system owner
+SEC	Security and adversarial	6.5	AI supply chain and classic information security	CISO
+LEG	Privacy, legal and regulatory	7.1	Personal data leakage, memorisation and sensitive inference	DPO
+LEG	Privacy, legal and regulatory	7.2	Unlawful processing	DPO
+LEG	Privacy, legal and regulatory	7.3	Intellectual property and confidentiality	Legal
+LEG	Privacy, legal and regulatory	7.4	AI Act and sector non-compliance	Compliance / AI officer
+LEG	Privacy, legal and regulatory	7.5	Liability and contractual exposure	Legal
+OPS	Third party, operations and lifecycle	8.1	Vendor dependence and concentration	Procurement / CTO
+OPS	Third party, operations and lifecycle	8.2	Service availability, latency, cost and capacity	Operations
+OPS	Third party, operations and lifecycle	8.3	Change management without re-assessment	System owner
+OPS	Third party, operations and lifecycle	8.4	Shadow AI and uninventoried use	AI officer
+OPS	Third party, operations and lifecycle	8.5	Maintainability, decommissioning and hardware	Operations
+SOC	Societal, environmental and strategic	9.1	Misinformation and synthetic content at scale	Communications / product owner
+SOC	Societal, environmental and strategic	9.2	Environmental impact	Sustainability lead
+SOC	Societal, environmental and strategic	9.3	Workforce, skills and labour effects	HR
+SOC	Societal, environmental and strategic	9.4	Strategic over- and under-investment	Executive / board
+SOC	Societal, environmental and strategic	9.5	Reputational and trust harm from the use of AI itself	Executive / communications

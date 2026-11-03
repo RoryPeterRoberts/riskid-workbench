@@ -1,0 +1,59 @@
+{
+  "indicators": [
+    {
+      "name": "Share of production inputs outside the training distribution; feature-distribution alerts",
+      "lines": ["DAT-05", "DAT-01"],
+      "meaning": "The population or data feed has moved, so validation figures no longer apply",
+      "read_by": "System owner"
+    },
+    {
+      "name": "Accuracy on recent labelled cases, where outcomes arrive",
+      "lines": ["MOD-06", "MOD-02"],
+      "meaning": "Concept drift: what the model learned no longer holds",
+      "read_by": "Model owner"
+    },
+    {
+      "name": "Override rate; agreement with the model on a blind sample",
+      "lines": ["HUM-01", "HUM-07"],
+      "meaning": "A rise: the model is worse or trust is falling. A fall towards zero: review may be rubber-stamping",
+      "read_by": "Business owner"
+    },
+    {
+      "name": "Complaints and explanation requests per thousand decisions; appeals overturned",
+      "lines": ["TRA-02", "FAI-01"],
+      "meaning": "Harm reaching people outside the organisation, often before any internal measure moves",
+      "read_by": "Service owner"
+    },
+    {
+      "name": "Incidents and near-misses, with time from awareness to report",
+      "lines": [],
+      "any_line": true,
+      "meaning": "Control failure; a serious-incident clock may be running",
+      "read_by": "AI officer"
+    },
+    {
+      "name": "Vendor version changes; regression pass rate per version",
+      "lines": ["MOD-05"],
+      "meaning": "A changed model behind a stable interface",
+      "read_by": "System owner"
+    },
+    {
+      "name": "Changes without a linked re-assessment",
+      "lines": ["OPS-05"],
+      "meaning": "Change control bypassed",
+      "read_by": "System owner"
+    },
+    {
+      "name": "Cost per transaction against plan",
+      "lines": ["OPS-04"],
+      "meaning": "Abuse, retries, longer outputs or a price change",
+      "read_by": "Operations and finance"
+    },
+    {
+      "name": "Tools found against tools inventoried; pilots past end date",
+      "lines": ["OPS-07", "OPS-08"],
+      "meaning": "Shadow AI growing; pilots going live",
+      "read_by": "AI officer"
+    }
+  ]
+}
