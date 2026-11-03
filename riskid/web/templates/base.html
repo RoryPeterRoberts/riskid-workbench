@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ module.title }} · RiskID Workbench</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/inventory">RiskID Workbench</a>
+  <nav>
+    {% for m in nav %}<a href="{{ m.path }}"{% if m.key == module.key %} aria-current="page"{% endif %}>{{ m.title }}</a>{% endfor %}
+  </nav>
+  <span class="actor">Recording as {{ actor }}</span>
+</header>
+<div class="module-head">
+  <p class="cite">Chapter {{ module.chapter }}: {{ module.chapter_title }} · Template {{ module.template }}</p>
+  <h1>{% block heading %}{{ module.title }}{% endblock %}</h1>
+</div>
+<div class="layout">
+  <main>{% block content %}{% endblock %}</main>
+  <aside class="why" aria-label="Why this module">
+    <h2>Why</h2>
+    <p class="rule">{{ module.why }}</p>
+    <p class="case"><strong>Opening case.</strong> {{ module.case }}</p>
+  </aside>
+</div>
+</body>
+</html>

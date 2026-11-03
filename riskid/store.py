@@ -65,6 +65,7 @@ _ENTITY_NAMES = (
     "organisation", "system", "register", "assessment", "control", "indicator",
     "usecase", "workshop", "interaction", "bowtie", "trigger", "cycle",
     "contract", "document", "library", "taxonomy", "pack",
+    "discovery",   # round 4: the Inventory's discovery ratio per quarter (SPEC.md 6.2)
 )
 
 
@@ -198,6 +199,22 @@ class Store:
         for r in rows:
             _apply_event(snap, _EventRow(r))
         return snap
+
+    # -- identifiers: never reused (SPEC.md section 4) ----------------------
+
+    def next_id(self, entity: str, prefix: str) -> str:
+        """The next ``PREFIX-nnn`` ID for ``entity``, one above any ever recorded.
+
+        Read from the event table, so an ID stays used even after its line is
+        retired: IDs are never reused.
+        """
+        rows = self._conn.execute(
+            "SELECT DISTINCT entity_id FROM events WHERE entity = ? AND entity_id LIKE ?",
+            (entity, f"{prefix}-%"),
+        ).fetchall()
+        numbers = [int(r[0][len(prefix) + 1:]) for r in rows
+                   if r[0][len(prefix) + 1:].isdigit()]
+        return f"{prefix}-{max(numbers, default=0) + 1:03d}"
 
     # -- retirement: an event, never a deletion ---------------------------
 
