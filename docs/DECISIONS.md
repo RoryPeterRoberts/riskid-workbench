@@ -33,3 +33,16 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   Moving a system to deployment or later is the gate decision, so a pilot
   that was risk-assessed but is still before deployment is still flagged.
   2026-11-03.
+- round 3: the fixture organisation is not committed. `tests/fixtures/`
+  ignores `*.riskid` (see `.gitignore`), so the tests build the fixture in a
+  temporary directory through a shared `fixture_org` fixture in
+  `tests/conftest.py`; `tests/fixtures/make_org.py` exposes
+  `build_org(path)` and, run as a script, writes `tests/fixtures/org.riskid`
+  for manual use only. Later rounds reuse the same `fixture_org` fixture
+  instead of re-deriving the organisation. 2026-11-03.
+- round 3: the CV-screening tool in the fixture is deliberately overdue under
+  the round 2 `pilot_overdue` rule: it carries a fixed `pilot_end_date`
+  (2026-06-30) that has passed and a `lifecycle_stage` of
+  `verification and validation`, still before deployment. The credit-scoring
+  model and the chatbot sit at `operation and monitoring` with no
+  `pilot_end_date`, so neither is flagged. 2026-11-03.
