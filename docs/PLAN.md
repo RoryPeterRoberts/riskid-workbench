@@ -31,7 +31,7 @@ pip install fastapi uvicorn jinja2 python-multipart openpyxl matplotlib weasypri
 
 Inputs that already exist and must be copied, not rewritten:
 - `~/RiskID_Harness/04_ai_book/register/risks.tsv` → `riskid/data/register.tsv` (91 lines, 23 columns; §4 LibraryLine)
-- `~/RiskID_Harness/04_ai_book/taxonomy/taxonomy.tsv` → `riskid/data/taxonomy.tsv` (43 lines)
+- `~/RiskID_Harness/04_ai_book/taxonomy/taxonomy.tsv` → `riskid/data/taxonomy.tsv` (42 lines, 5 columns)
 - `~/RiskID_Harness/04_ai_book/register/build_register.py` → `tests/reference/build_register.py` (the reference scoring; read it, do not import it into the app)
 - Chapter 13's indicator table and chapter 9's scales → `riskid/data/indicators.json`, `riskid/data/scales.json` (typed in round 1 from `SPEC.md` §5 and the tables in `docs/BOOK_TABLES.md`, which the plan's author provides)
 
@@ -55,7 +55,7 @@ Done when: tests green; `git init` done; first commit.
 
 ### Round 1 — data packs and model
 Files: `riskid/data/register.tsv`, `taxonomy.tsv`, `scales.json`, `indicators.json`, `VERSION`; `riskid/model.py` (dataclasses for every entity in SPEC §4, with `to_dict`/`from_dict`); `riskid/importers.py` (`load_library()`, `load_taxonomy()`, `load_scales()`, `load_indicators()`).
-Tests: `test_importers.py`: 91 library lines with the 23 columns; 43 taxonomy lines; every library line's l1/l2 exists in the taxonomy; scales have five levels on five dimensions plus likelihood, vulnerability, speed, data quality; every indicator names at least one register line that exists.
+Tests: `test_importers.py`: 91 library lines with the 23 columns; 42 taxonomy lines; every library line's l1/l2 exists in the taxonomy; scales have five levels on five dimensions plus likelihood, vulnerability, speed, data quality; every indicator names at least one register line that exists.
 Done when: green.
 
 ### Round 2 — the rules
@@ -66,7 +66,7 @@ Done when: golden matches 91/91; green.
 ### Round 3 — the store and the audit trail
 Files: `riskid/store.py`: `Store(path)` over SQLite; `append(event)`; projections for each entity; `replay(date)`; `retire(line_id, reason, actor)`; no delete; `riskid init` creates the file and loads the packs; `riskid rebuild`.
 Also: `tests/fixtures/make_org.py` builds the fixture organisation (three systems: a credit-scoring model bought and configured, deployer, Article 6 high-risk; a customer-service chatbot, deployer, Article 50 duty; a CV-screening tool in pilot past its end date) and saves `tests/fixtures/org.riskid`.
-Tests: `test_store.py`: events append and project; a change then `replay(before)` shows the old value; `retire` keeps the line in replay and removes it from the live view; any call that would delete raises; `riskid init` on a temp path yields 91 library lines and 43 taxonomy lines; the fixture builds.
+Tests: `test_store.py`: events append and project; a change then `replay(before)` shows the old value; `retire` keeps the line in replay and removes it from the live view; any call that would delete raises; `riskid init` on a temp path yields 91 library lines and 42 taxonomy lines; the fixture builds.
 Done when: green.
 
 ### Round 4 — the web shell and Inventory (SPEC §6.2, B.1)

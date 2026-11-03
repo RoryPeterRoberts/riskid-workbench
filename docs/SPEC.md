@@ -33,7 +33,7 @@
 | Contracts | B.9 | **Contracts** | 17 clauses per vendor system, gaps shown against register lines |
 | Rules | Ch 15 | **Hooks** | regulatory hooks per line; the role-and-date calendar as an updatable data pack |
 | Lessons | Ch 16 | **Teach** | every screen cites its chapter and shows its opening case; the case library is browsable by taxonomy line |
-| Library | App A, Ch 4 | **Library** | the 91-line register and the 43-line taxonomy, preloaded and versioned |
+| Library | App A, Ch 4 | **Library** | the 91-line register and the 42-line taxonomy, preloaded and versioned |
 
 ## 3. User journeys
 
@@ -61,7 +61,7 @@ One SQLite file per organisation (`<org>.riskid`), with an event table that is t
 
 - **Organisation**: name, sector, jurisdictions, risk criteria (the acceptable-risk statement of chapter 5), accountable executive, AI officer, facilitator.
 - **System** (B.1, 18 fields): id (persistent), name, function, components, vendor_or_built, supplier, contract_ref, model_provider, model_name, model_version, version_pinned, last_change_notice, purpose_stated, purpose_in_use, users (role, number), persons_affected (groups, vulnerable flag), data (training sources, production inputs, personal, special category, locations), role_under_act (provider | deployer | both), article_25_check, article_5_screen, article_6_outcome (+ record ref, Article 50 duty), owner, model_owner, data_owner, lifecycle_stage (one of seven), jurisdictions, period_and_frequency, impact_assessments (DPIA, FRIA, 42005: ref, date, next due), last_risk_assessment (date, version), discovery_source (declared | procurement | scan | audit | incident), pilot_end_date, logs (location, retention).
-- **TaxonomyLine**: l1_code, l1, l2_code, l2, owner_function (43 rows, versioned with the library).
+- **TaxonomyLine**: l1_code, l1, l2_code, l2, owner_function (42 rows, versioned with the library).
 - **LibraryLine** (Appendix A, 91 rows): the register columns of `risks.tsv`: id, l1, l2, title, description, lifecycle, role, harmed, exposure, event, L, I, dim, V, S, dq, controls, rL, rI, owner (role), kri, reg, sources. Read-only; adopted into RegisterLines.
 - **RegisterLine** (B.3, 14 + 5): id (register ID kept on adoption, or ORG-nnn for new lines), system_id, taxonomy (l1, l2), definition, coso_category, owner (person), status (candidate | active | retired), retired_reason, source (top-down | bottom-up | library | event), trend, last_review, next_review, lifecycle_stages, role, persons_affected, regulatory_hooks, annex_a_controls, interaction_summary.
 - **Assessment** (B.6): line_id, date, assessor, harm_scored, unit_of_exposure, impact per dimension {FIN, REG, REP, IND, OPS}: 1–5, dominant_dimension (+ reasoning), likelihood 1–5, vulnerability 1–5, speed 1–5, inherent (computed), inherent_band (computed), material (computed + rule), data_quality (High | Medium | Low | Very Low) + basis, residual_L, residual_I (locked until a tested control exists), residual (computed), acceptable (yes | no, by whom), model_vendor_dependency (text; AI-drafted text noted), disagreement (minority score, dimension, evidence).
@@ -100,7 +100,7 @@ Server-rendered pages, one per module, each with a header line that names the ch
 
 1. **Dashboard**: systems by stage; lines by band (inherent and residual); material lines and their owners; indicators in amber or red; triggers unprocessed; next cycle due; version mismatches; pilots overdue; the heat map.
 2. **Inventory** (B.1): list and form; discovery ratio (tools found against tools inventoried) entered per quarter.
-3. **Library**: the 91 lines and 43 taxonomy lines; search; "propose lines for this system"; adopt.
+3. **Library**: the 91 lines and 42 taxonomy lines; search; "propose lines for this system"; adopt.
 4. **Workshop** (B.4, B.5): a facilitator view that walks the six stages; a participant entry view for pre-lists and votes (same machine, or a printed form keyed in).
 5. **Use cases** (B.2): the template as a form with the examples from MOD-05 as placeholders; the return reasons shown in red.
 6. **Reconcile**: the five steps as tabs; the disagreement log.
