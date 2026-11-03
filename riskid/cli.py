@@ -8,6 +8,7 @@ section 4, rounds 4 and 14).
 """
 
 import argparse
+import sys
 
 # The commands, in the order PLAN.md section 4 introduces them.
 COMMANDS = ("init", "serve", "check", "rebuild")
@@ -16,18 +17,25 @@ COMMANDS = ("init", "serve", "check", "rebuild")
 def _cmd_init(path: str) -> int:
     from riskid.store import init
 
-    with init(path) as store:
-        n_library = len(store.library())
-        n_taxonomy = len(store.taxonomy())
+    try:
+        with init(path) as store:
+            n_library = len(store.library())
+            n_taxonomy = len(store.taxonomy())
+    except FileExistsError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"initialised {path}: {n_library} library lines, {n_taxonomy} taxonomy lines")
     return 0
 
 
 def _cmd_rebuild(path: str) -> int:
-    from riskid.store import Store
+    from riskid.store import rebuild
 
-    with Store(path) as store:
-        n_events = store.rebuild()
+    try:
+        n_events = rebuild(path)
+    except FileNotFoundError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"rebuilt projections for {path} from {n_events} events")
     return 0
 

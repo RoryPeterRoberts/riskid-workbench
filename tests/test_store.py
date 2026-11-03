@@ -8,6 +8,8 @@ the fixture builds. Plus the round 2 ``pilot_overdue`` check on the fixture's
 CV-screening system.
 """
 
+from datetime import date, datetime, timezone
+
 import pytest
 
 from riskid import rules
@@ -135,3 +137,76 @@ def test_rebuild_module_function(tmp_path):
     ))
     store.close()
     assert rebuild(tmp_path / "s.riskid") >= 1
+
+
+def test_replay_includes_the_whole_day_asked_for(tmp_path):
+    store = _store(tmp_path)
+    store.append(Event(
+        entity="system", entity_id="SYS-001",
+        new={"owner": "alice"},
+        timestamp="2026-06-30T09:00:00Z", actor="t",
+    ))
+    store.append(Event(
+        entity="system", entity_id="SYS-001",
+        field="owner", old="alice", new="bob",
+        timestamp="2026-06-30T10:00:00Z", actor="t",   # the 10:00 change
+    ))
+    store.append(Event(
+        entity="system", entity_id="SYS-001",
+        field="owner", old="bob", new="carol",
+        timestamp="2026-07-01T00:00:00Z", actor="t",   # the next day
+    ))
+
+    # A bare date asks for the whole of that UTC day: the 10:00 change is in,
+    # the 1 July change is not.
+    assert store.replay("2026-06-30")["system"]["SYS-001"]["owner"] == "bob"
+    assert store.replay(date(2026, 6, 30))["system"]["SYS-001"]["owner"] == "bob"
+
+    # ... but the 10:00 change is not in a replay up to 09:00 that same day.
+    at_nine = store.replay(datetime(2026, 6, 30, 9, 0, tzinfo=timezone.utc))
+    assert at_nine["system"]["SYS-001"]["owner"] == "alice"
+    store.close()
+
+
+def test_init_stamps_the_pack_load_from_today(tmp_path):
+    store = init(tmp_path / "org.riskid")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # with no when, the packs are recorded as loaded right now, not on some
+    # back-dated date
+    assert store.state()["pack"]["library"]["date"].startswith(today)
+    store.close()
+
+
+def test_init_refuses_an_existing_file(tmp_path):
+    from riskid.cli import main
+
+    target = tmp_path / "org.riskid"
+    assert main(["init", str(target)]) == 0
+    assert main(["init", str(target)]) == 1   # a second init is refused
+
+
+def test_rebuild_refuses_a_missing_file(tmp_path):
+    from riskid.cli import main
+
+    assert main(["rebuild", str(tmp_path / "nope.riskid")]) == 1
+
+
+def test_retire_refuses_a_line_not_in_the_register(tmp_path):
+    store = _store(tmp_path)
+    store.append(Event(
+        entity="register", entity_id="RL-1",
+        new={"id": "RL-1", "status": "active"},
+        timestamp="2026-11-01", actor="t",
+    ))
+    with pytest.raises(KeyError):
+        store.retire("RL-TYPO", reason="never existed", actor="rory")
+    # nothing was appended: the register is unchanged
+    assert [r["id"] for r in store.register_live()] == ["RL-1"]
+    store.close()
+
+
+def test_fixture_risk_criteria_match_the_rules(fixture_org):
+    criteria = fixture_org.organisation()["risk_criteria"].lower()
+    assert "15 or more" in criteria      # §5.3: material at inherent >= 15
+    assert "impact is 5" in criteria     # §5.3: ...or impact 5
+    assert "article 5" in criteria       # ch 5: a prohibited practice is not accepted

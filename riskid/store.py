@@ -14,8 +14,9 @@ covers every entity, and a few read views. There is no ORM.
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from riskid import importers
@@ -65,9 +66,62 @@ _ENTITY_NAMES = (
 )
 
 
+# A bare ISO date, e.g. 2026-06-30. In a replay cutoff it means the whole of
+# that UTC day; stored as the day's midnight.
+_BARE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _to_utc(value):
+    """Coerce a date, datetime, ISO string (or ``None``) to an aware UTC time.
+
+    A bare date is that day's midnight; a naive datetime is taken as UTC; a
+    datetime with another offset is converted to UTC; a string is parsed as
+    ISO 8601, where a bare date is midnight and a trailing ``Z`` means UTC.
+    ``None`` (or an empty string) is the current UTC time.
+    """
+    if value is None or value == "":
+        return datetime.now(timezone.utc)
+    if isinstance(value, datetime):
+        dt = value
+    elif isinstance(value, date):
+        dt = datetime(value.year, value.month, value.day, tzinfo=timezone.utc)
+    else:
+        text = str(value).strip()
+        if _BARE_DATE.match(text):
+            d = date.fromisoformat(text)
+            dt = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+        else:
+            parsed = text[:-1] + "+00:00" if text.endswith(("Z", "z")) else text
+            dt = datetime.fromisoformat(parsed)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _stamp(value) -> str:
+    """The one timestamp form the store uses: UTC to the second, ``...Z``."""
+    return _to_utc(value).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def _now() -> str:
-    """A deterministic-enough default timestamp for events without one."""
-    return datetime.now().isoformat(timespec="seconds")
+    """The current UTC time in the store's one timestamp form."""
+    return _stamp(None)
+
+
+def _replay_cutoff(when) -> str:
+    """The last timestamp ``replay(when)`` includes.
+
+    A bare date means the whole of that UTC day (its final second); a datetime
+    means everything up to that instant.
+    """
+    if isinstance(when, datetime):
+        return _stamp(when)
+    if isinstance(when, date):
+        return _stamp(f"{when.isoformat()}T23:59:59")
+    text = str(when).strip()
+    if _BARE_DATE.match(text):
+        return _stamp(f"{text}T23:59:59")
+    return _stamp(when)
 
 
 def _json(value) -> str | None:
@@ -118,7 +172,7 @@ class Store:
         """
         if event.entity not in _ENTITY_NAMES:
             raise ValueError(f"unknown event entity: {event.entity!r}")
-        ts = event.timestamp or _now()
+        ts = _stamp(event.timestamp)
         row = self._conn.execute(
             "SELECT state FROM projection WHERE entity = ? AND entity_id = ?",
             (event.entity, event.entity_id),
@@ -181,18 +235,20 @@ class Store:
 
     # -- time travel: the audit trail replayed ----------------------------
 
-    def replay(self, when: str | date) -> dict:
+    def replay(self, when) -> dict:
         """Reconstruct every entity as it stood on ``when``, from the event table only.
 
         Returns the same {entity: {entity_id: state}} shape as :meth:`state`,
-        but rebuilt from events up to and including ``when``. A line retired
-        later still appears here (its events are never deleted); a line that
-        had not yet been created is absent.
+        but rebuilt from events up to and including ``when``. A bare date means
+        the whole of that UTC day (so everything on it is included, not just
+        its midnight); a datetime means up to that instant. A line retired later
+        still appears here (its events are never deleted); a line that had not
+        yet been created is absent.
         """
         rows = self._conn.execute(
             "SELECT entity, entity_id, field, new FROM events WHERE ts <= ? "
             "ORDER BY seq",
-            (str(when),),
+            (_replay_cutoff(when),),
         ).fetchall()
         snap: dict = {}
         for r in rows:
@@ -207,11 +263,15 @@ class Store:
 
         Emits a status event and a retired_reason event so the line stays
         present in every replay while :meth:`register_live` excludes it.
+        Raises :class:`KeyError` if ``line_id`` is not in the register, so a
+        typo cannot retire a line that does not exist.
         Returns the seqs of the two events.
         """
-        base = str(when) if when is not None else None
         snap = self._projections().get("register", {})
-        old_status = snap.get(line_id, {}).get("status")
+        if line_id not in snap:
+            raise KeyError(f"cannot retire {line_id!r}: it is not in the register")
+        base = _stamp(when)
+        old_status = snap[line_id].get("status")
         seqs = []
         for field, value in (("status", "retired"), ("retired_reason", reason)):
             ev = Event(
@@ -255,13 +315,17 @@ class Store:
 
     # -- loading the data packs (riskid init) -----------------------------
 
-    def load_packs(self, when: str = "2026-11-01", actor: str = "riskid") -> dict:
+    def load_packs(self, when=None, actor: str = "riskid") -> dict:
         """Load the bundled data packs as events (SPEC.md 7.1, 8.3).
 
         Records the 91 library lines, the 42 taxonomy lines and the versions
-        of the scales and indicator presets. Idempotent only on a fresh file;
-        run it on a freshly created store.
+        of the scales and indicator presets. ``when`` is when the packs are
+        recorded as loaded; with no value the current UTC time is used, so a
+        new file never back-dates its own load. Idempotent only on a fresh
+        file; run it on a freshly created store.
         """
+        if when is None:
+            when = _now()
         version = importers.load_version()
         n_library = n_taxonomy = 0
         for line in importers.load_library():
@@ -314,13 +378,31 @@ class _EventRow:
 # -- module-level entry points for the CLI ---------------------------------
 
 
-def init(path: str | Path) -> Store:
-    """Create the organisation file and load the data packs (PLAN.md round 3)."""
-    store = Store(path)
-    store.load_packs()
+def init(path: str | Path, when=None) -> Store:
+    """Create the organisation file and load the data packs (PLAN.md round 3).
+
+    ``init`` only creates a new file; a path that already holds an organisation
+    is refused (rebuild it instead of re-initialising). ``when`` fixes when the
+    packs are recorded as loaded; with no value the current UTC time is used.
+    """
+    target = Path(path)
+    if target.exists():
+        raise FileExistsError(
+            f"an organisation file already exists at {target}; "
+            "rebuild it instead of re-initialising")
+    store = Store(target)
+    store.load_packs(when=when)
     return store
 
 
 def rebuild(path: str | Path) -> int:
-    """Rebuild the projections of an existing organisation file from its events."""
-    return Store(path).rebuild()
+    """Rebuild the projections of an existing organisation file from its events.
+
+    Refuses a path that does not exist: an append-only trail cannot be rebuilt
+    from nothing, and creating an empty file here would hide the mistake.
+    """
+    target = Path(path)
+    if not target.exists():
+        raise FileNotFoundError(
+            f"no organisation file at {target}; create it with `riskid init`")
+    return Store(target).rebuild()

@@ -25,8 +25,8 @@ from pathlib import Path
 from riskid.model import Event, Organisation, System
 from riskid.store import init as _init
 
-# When the fixture was built. The packs load first (init), then the
-# organisation and its systems are recorded.
+# When the fixture was built. The packs load first (init, recorded as
+# PACK_TS), then the organisation and its systems are recorded.
 PACK_TS = "2026-11-01"
 ORG_TS = "2026-11-02"
 SYSTEM_TS = "2026-11-02"
@@ -35,8 +35,11 @@ ORG = Organisation(
     name="Northwind Analytics Ltd",
     sector="financial services",
     jurisdictions=["EU", "UK"],
-    risk_criteria=("material risk means a likelihood-impact score of 10 or "
-                   "more, or any Critical outcome on an individual dimension"),
+    risk_criteria=("material when the inherent likelihood-impact score is 15 "
+                   "or more, or the impact is 5; a line the library flags "
+                   "material-on-impact-alone (LEG-08) is material whatever the "
+                   "likelihood. A practice prohibited by Article 5 is not "
+                   "accepted at any score."),
     accountable_executive="Chief Financial Officer",
     ai_officer="Chief AI Officer",
     facilitator="AI Risk Facilitator",
@@ -92,7 +95,7 @@ def build_org(path: str | Path):
     The store is created with the data packs loaded (``riskid init``), then
     the organisation and its three systems are appended as events.
     """
-    store = _init(path)
+    store = _init(path, when=PACK_TS)
     store.append(Event(
         timestamp=ORG_TS, actor="fixture", entity="organisation",
         entity_id="organisation", new=ORG.to_dict(),
