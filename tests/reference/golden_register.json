@@ -1,0 +1,734 @@
+{
+  "count": 91,
+  "source": "build_register.py load() over the 91-line register",
+  "lines": [
+    {
+      "id": "DAT-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-03",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-04",
+      "inherent": 9,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-05",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "DAT-06",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-07",
+      "inherent": 9,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "DAT-08",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-03",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-04",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-05",
+      "inherent": 16,
+      "residual": 6,
+      "inherent_band": "Critical",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "MOD-06",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-07",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-08",
+      "inherent": 12,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-09",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-10",
+      "inherent": 10,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": true
+    },
+    {
+      "id": "MOD-11",
+      "inherent": 8,
+      "residual": 3,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-12",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "MOD-13",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "MOD-14",
+      "inherent": 10,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": true
+    },
+    {
+      "id": "FAI-01",
+      "inherent": 15,
+      "residual": 8,
+      "inherent_band": "Critical",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "FAI-02",
+      "inherent": 15,
+      "residual": 8,
+      "inherent_band": "Critical",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "FAI-03",
+      "inherent": 15,
+      "residual": 8,
+      "inherent_band": "Critical",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "FAI-04",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "FAI-05",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "FAI-06",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "FAI-07",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "TRA-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "TRA-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "TRA-03",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "TRA-04",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "TRA-05",
+      "inherent": 12,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "TRA-06",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "TRA-07",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "TRA-08",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "HUM-01",
+      "inherent": 16,
+      "residual": 9,
+      "inherent_band": "Critical",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "HUM-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-03",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-04",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-05",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-06",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-07",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "HUM-08",
+      "inherent": 10,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": true
+    },
+    {
+      "id": "HUM-09",
+      "inherent": 10,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": true
+    },
+    {
+      "id": "SEC-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-03",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-04",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SEC-05",
+      "inherent": 6,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SEC-06",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-07",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-08",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-09",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-10",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SEC-11",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-02",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-03",
+      "inherent": 12,
+      "residual": 8,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-04",
+      "inherent": 10,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": true
+    },
+    {
+      "id": "LEG-05",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-06",
+      "inherent": 6,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "LEG-07",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-08",
+      "inherent": 10,
+      "residual": 5,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": true
+    },
+    {
+      "id": "LEG-09",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "LEG-10",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-11",
+      "inherent": 8,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "LEG-12",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "LEG-13",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "OPS-01",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "OPS-02",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-03",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "OPS-04",
+      "inherent": 12,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-05",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "OPS-06",
+      "inherent": 8,
+      "residual": 3,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-07",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "OPS-08",
+      "inherent": 12,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-09",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-10",
+      "inherent": 6,
+      "residual": 2,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "OPS-11",
+      "inherent": 8,
+      "residual": 3,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-01",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-02",
+      "inherent": 12,
+      "residual": 6,
+      "inherent_band": "High",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SOC-03",
+      "inherent": 6,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-04",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-05",
+      "inherent": 6,
+      "residual": 3,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-06",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-07",
+      "inherent": 6,
+      "residual": 6,
+      "inherent_band": "Moderate",
+      "residual_band": "Moderate",
+      "material": false
+    },
+    {
+      "id": "SOC-08",
+      "inherent": 9,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-09",
+      "inherent": 12,
+      "residual": 4,
+      "inherent_band": "High",
+      "residual_band": "Low",
+      "material": false
+    },
+    {
+      "id": "SOC-10",
+      "inherent": 6,
+      "residual": 4,
+      "inherent_band": "Moderate",
+      "residual_band": "Low",
+      "material": false
+    }
+  ]
+}

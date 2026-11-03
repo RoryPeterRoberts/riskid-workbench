@@ -20,3 +20,9 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   test treat it as applying to every line, so the "every indicator names a
   register line" check is a data-integrity check on the 8 line-specific
   presets, not a special case that forces a pass.
+- round 2: the golden file `tests/reference/golden_register.json` is
+  generated from the book's reference scoring script
+  `~/RiskID_Har…/build_register.py` (imported in a throwaway Python 3.12
+  environment and called, never run as a script; PyYAML is needed at import
+  time there and is not added to the project). Only the golden file is
+  committed, not the reference script or its private paths. 2026-11-03.
