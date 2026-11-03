@@ -1,0 +1,408 @@
+"""The store and the audit trail (PLAN.md section 4, round 3).
+
+SPEC.md section 4: one SQLite file per organisation, holding an event table
+that is the source of truth plus tables that are projections of it. The event
+table is append-only (SPEC.md 5.6, nothing is ever deleted; retirement is
+itself an event) and the projections are rebuilt from it on demand
+(SPEC.md section 9, ``riskid rebuild``).
+
+The module is a thin repo layer over the standard-library ``sqlite3`` driver
+(SPEC.md section 9): the event table, a single generic projection table that
+covers every entity, and a few read views. There is no ORM.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sqlite3
+from datetime import date, datetime, timezone
+from pathlib import Path
+
+from riskid import importers
+from riskid.model import DataPack, Event
+
+__all__ = [
+    "Store",
+    "NoDeleteError",
+    "init",
+    "rebuild",
+]
+
+
+class NoDeleteError(Exception):
+    """Raised when a call would delete data (SPEC.md 5.6: retirement is an event)."""
+
+
+_SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+    seq          INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts           TEXT NOT NULL,
+    actor        TEXT,
+    entity       TEXT NOT NULL,
+    entity_id    TEXT NOT NULL,
+    field        TEXT,
+    old          TEXT,
+    new          TEXT,
+    reason       TEXT,
+    evidence_ref TEXT,
+    ai_draft     TEXT
+);
+CREATE TABLE IF NOT EXISTS projection (
+    entity    TEXT NOT NULL,
+    entity_id TEXT NOT NULL,
+    state     TEXT NOT NULL,
+    PRIMARY KEY (entity, entity_id)
+);
+CREATE INDEX IF NOT EXISTS events_ts ON events (ts, seq);
+"""
+
+# Entity names used as event.entity values. One projection table covers every
+# entity, so the set of names only ever grows.
+_ENTITY_NAMES = (
+    "organisation", "system", "register", "assessment", "control", "indicator",
+    "usecase", "workshop", "interaction", "bowtie", "trigger", "cycle",
+    "contract", "document", "library", "taxonomy", "pack",
+)
+
+
+# A bare ISO date, e.g. 2026-06-30. In a replay cutoff it means the whole of
+# that UTC day; stored as the day's midnight.
+_BARE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _to_utc(value):
+    """Coerce a date, datetime, ISO string (or ``None``) to an aware UTC time.
+
+    A bare date is that day's midnight; a naive datetime is taken as UTC; a
+    datetime with another offset is converted to UTC; a string is parsed as
+    ISO 8601, where a bare date is midnight and a trailing ``Z`` means UTC.
+    ``None`` (or an empty string) is the current UTC time.
+    """
+    if value is None or value == "":
+        return datetime.now(timezone.utc)
+    if isinstance(value, datetime):
+        dt = value
+    elif isinstance(value, date):
+        dt = datetime(value.year, value.month, value.day, tzinfo=timezone.utc)
+    else:
+        text = str(value).strip()
+        if _BARE_DATE.match(text):
+            d = date.fromisoformat(text)
+            dt = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+        else:
+            parsed = text[:-1] + "+00:00" if text.endswith(("Z", "z")) else text
+            dt = datetime.fromisoformat(parsed)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _stamp(value) -> str:
+    """The one timestamp form the store uses: UTC to the second, ``...Z``."""
+    return _to_utc(value).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _now() -> str:
+    """The current UTC time in the store's one timestamp form."""
+    return _stamp(None)
+
+
+def _replay_cutoff(when) -> str:
+    """The last timestamp ``replay(when)`` includes.
+
+    A bare date means the whole of that UTC day (its final second); a datetime
+    means everything up to that instant.
+    """
+    if isinstance(when, datetime):
+        return _stamp(when)
+    if isinstance(when, date):
+        return _stamp(f"{when.isoformat()}T23:59:59")
+    text = str(when).strip()
+    if _BARE_DATE.match(text):
+        return _stamp(f"{text}T23:59:59")
+    return _stamp(when)
+
+
+def _json(value) -> str | None:
+    """Serialise an event payload column; None stays NULL so columns stay compact."""
+    if value is None:
+        return None
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
+def _loads(raw: str | None):
+    if raw is None:
+        return None
+    return json.loads(raw)
+
+
+class Store:
+    """An organisation store: an append-only event table plus projections of it."""
+
+    def __init__(self, path: str | Path):
+        self.path = Path(path)
+        self._conn = sqlite3.connect(self.path)
+        self._conn.row_factory = sqlite3.Row
+        self._ensure_schema()
+
+    # -- lifecycle ---------------------------------------------------------
+
+    def _ensure_schema(self) -> None:
+        self._conn.executescript(_SCHEMA)
+        self._conn.commit()
+
+    def close(self) -> None:
+        self._conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    # -- the append-only audit trail ---------------------------------------
+
+    def append(self, event: Event) -> int:
+        """Append one event to the audit trail and fold it into the projections.
+
+        A whole-entity event carries ``field=None`` and a full state in
+        ``new``; a field change carries the field name and the new value.
+        Returns the ``seq`` of the stored row, which is the audit trail's order.
+        """
+        if event.entity not in _ENTITY_NAMES:
+            raise ValueError(f"unknown event entity: {event.entity!r}")
+        ts = _stamp(event.timestamp)
+        row = self._conn.execute(
+            "SELECT state FROM projection WHERE entity = ? AND entity_id = ?",
+            (event.entity, event.entity_id),
+        ).fetchone()
+        state = json.loads(row["state"]) if row else {}
+        if event.field is None:
+            state = dict(event.new or {})
+        else:
+            state = {**state, event.field: event.new}
+        self._conn.execute(
+            "INSERT INTO projection (entity, entity_id, state) VALUES (?, ?, ?) "
+            "ON CONFLICT (entity, entity_id) DO UPDATE SET state = excluded.state",
+            (event.entity, event.entity_id, _json(state)),
+        )
+        cur = self._conn.execute(
+            "INSERT INTO events (ts, actor, entity, entity_id, field, old, new, "
+            "reason, evidence_ref, ai_draft) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                ts, event.actor, event.entity, event.entity_id, event.field,
+                _json(event.old), _json(event.new), event.reason,
+                event.evidence_ref, _json(event.ai_draft) if event.ai_draft else None,
+            ),
+        )
+        self._conn.commit()
+        return cur.lastrowid
+
+    # -- projections (the live view) --------------------------------------
+
+    def _projections(self) -> dict:
+        rows = self._conn.execute(
+            "SELECT entity, entity_id, state FROM projection"
+        ).fetchall()
+        snap: dict = {}
+        for r in rows:
+            snap.setdefault(r["entity"], {})[r["entity_id"]] = json.loads(r["state"])
+        return snap
+
+    def state(self) -> dict:
+        """The full current snapshot: {entity: {entity_id: state}}, including retired lines."""
+        return self._projections()
+
+    def systems(self) -> list:
+        return [s for _, s in sorted(self._projections().get("system", {}).items())]
+
+    def register_live(self) -> list:
+        """Register lines that are still in the live register (not retired)."""
+        return [
+            s for _, s in sorted(self._projections().get("register", {}).items())
+            if s.get("status") != "retired"
+        ]
+
+    def library(self) -> list:
+        return [s for _, s in sorted(self._projections().get("library", {}).items())]
+
+    def taxonomy(self) -> list:
+        return [s for _, s in sorted(self._projections().get("taxonomy", {}).items())]
+
+    def organisation(self) -> dict | None:
+        return self._projections().get("organisation", {}).get("organisation")
+
+    # -- time travel: the audit trail replayed ----------------------------
+
+    def replay(self, when) -> dict:
+        """Reconstruct every entity as it stood on ``when``, from the event table only.
+
+        Returns the same {entity: {entity_id: state}} shape as :meth:`state`,
+        but rebuilt from events up to and including ``when``. A bare date means
+        the whole of that UTC day (so everything on it is included, not just
+        its midnight); a datetime means up to that instant. A line retired later
+        still appears here (its events are never deleted); a line that had not
+        yet been created is absent.
+        """
+        rows = self._conn.execute(
+            "SELECT entity, entity_id, field, new FROM events WHERE ts <= ? "
+            "ORDER BY seq",
+            (_replay_cutoff(when),),
+        ).fetchall()
+        snap: dict = {}
+        for r in rows:
+            _apply_event(snap, _EventRow(r))
+        return snap
+
+    # -- retirement: an event, never a deletion ---------------------------
+
+    def retire(self, line_id: str, reason: str, actor: str,
+               when: str | date | None = None) -> list:
+        """Retire a register line: keep its full history, flag it out of the live view.
+
+        Emits a status event and a retired_reason event so the line stays
+        present in every replay while :meth:`register_live` excludes it.
+        Raises :class:`KeyError` if ``line_id`` is not in the register, so a
+        typo cannot retire a line that does not exist.
+        Returns the seqs of the two events.
+        """
+        snap = self._projections().get("register", {})
+        if line_id not in snap:
+            raise KeyError(f"cannot retire {line_id!r}: it is not in the register")
+        base = _stamp(when)
+        old_status = snap[line_id].get("status")
+        seqs = []
+        for field, value in (("status", "retired"), ("retired_reason", reason)):
+            ev = Event(
+                timestamp=base, actor=actor, entity="register", entity_id=line_id,
+                field=field, old=(old_status if field == "status" else None),
+                new=value, reason=reason,
+            )
+            seqs.append(self.append(ev))
+        return seqs
+
+    def delete(self, *args, **kwargs) -> None:
+        """The store never deletes; SPEC.md 5.6. Raises on any attempt."""
+        raise NoDeleteError(
+            "the store never deletes data; retirement is an event (SPEC.md 5.6)"
+        )
+
+    # -- projections rebuilt from the event table (riskid rebuild) --------
+
+    def rebuild(self) -> int:
+        """Drop and regenerate the projection tables from the event table.
+
+        This is what ``riskid rebuild`` runs: the projections are disposable
+        because the event table is the source of truth.
+        """
+        self._conn.execute("DELETE FROM projection")
+        rows = self._conn.execute(
+            "SELECT entity, entity_id, field, new FROM events ORDER BY seq"
+        ).fetchall()
+        snap: dict = {}
+        for r in rows:
+            _apply_event(snap, _EventRow(r))
+        for entity, by_id in snap.items():
+            for entity_id, state in by_id.items():
+                self._conn.execute(
+                    "INSERT OR REPLACE INTO projection (entity, entity_id, state) "
+                    "VALUES (?, ?, ?)",
+                    (entity, entity_id, _json(state)),
+                )
+        self._conn.commit()
+        return len(rows)
+
+    # -- loading the data packs (riskid init) -----------------------------
+
+    def load_packs(self, when=None, actor: str = "riskid") -> dict:
+        """Load the bundled data packs as events (SPEC.md 7.1, 8.3).
+
+        Records the 91 library lines, the 42 taxonomy lines and the versions
+        of the scales and indicator presets. ``when`` is when the packs are
+        recorded as loaded; with no value the current UTC time is used, so a
+        new file never back-dates its own load. Idempotent only on a fresh
+        file; run it on a freshly created store.
+        """
+        if when is None:
+            when = _now()
+        version = importers.load_version()
+        n_library = n_taxonomy = 0
+        for line in importers.load_library():
+            self.append(Event(
+                timestamp=when, actor=actor, entity="library",
+                entity_id=line.id, new=line.to_dict(),
+                reason="library pack load",
+            ))
+            n_library += 1
+        for row in importers.load_taxonomy():
+            self.append(Event(
+                timestamp=when, actor=actor, entity="taxonomy",
+                entity_id=row.l2_code, new=row.to_dict(),
+                reason="taxonomy pack load",
+            ))
+            n_taxonomy += 1
+        for pack in ("library", "scales", "indicators"):
+            self.append(Event(
+                timestamp=when, actor=actor, entity="pack", entity_id=pack,
+                new=DataPack(
+                    name=pack, version=version, date=when, source="bundled"
+                ).to_dict(),
+                reason="data pack version",
+            ))
+        return {"library": n_library, "taxonomy": n_taxonomy, "version": version}
+
+
+# -- helpers ----------------------------------------------------------------
+
+
+def _apply_event(snap: dict, event) -> None:
+    """Fold one event into a {entity: {entity_id: state}} snapshot, in place."""
+    by_id = snap.setdefault(event.entity, {})
+    if event.field is None:
+        by_id[event.entity_id] = dict(event.new or {})
+    else:
+        by_id.setdefault(event.entity_id, {})[event.field] = event.new
+
+
+class _EventRow:
+    """Adapts an events-table row to the (entity, entity_id, field, new) shape."""
+
+    def __init__(self, row):
+        self.entity = row["entity"]
+        self.entity_id = row["entity_id"]
+        self.field = row["field"]
+        self.new = _loads(row["new"])
+
+
+# -- module-level entry points for the CLI ---------------------------------
+
+
+def init(path: str | Path, when=None) -> Store:
+    """Create the organisation file and load the data packs (PLAN.md round 3).
+
+    ``init`` only creates a new file; a path that already holds an organisation
+    is refused (rebuild it instead of re-initialising). ``when`` fixes when the
+    packs are recorded as loaded; with no value the current UTC time is used.
+    """
+    target = Path(path)
+    if target.exists():
+        raise FileExistsError(
+            f"an organisation file already exists at {target}; "
+            "rebuild it instead of re-initialising")
+    store = Store(target)
+    store.load_packs(when=when)
+    return store
+
+
+def rebuild(path: str | Path) -> int:
+    """Rebuild the projections of an existing organisation file from its events.
+
+    Refuses a path that does not exist: an append-only trail cannot be rebuilt
+    from nothing, and creating an empty file here would hide the mistake.
+    """
+    target = Path(path)
+    if not target.exists():
+        raise FileNotFoundError(
+            f"no organisation file at {target}; create it with `riskid init`")
+    return Store(target).rebuild()
