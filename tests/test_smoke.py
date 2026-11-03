@@ -15,7 +15,9 @@ from fastapi.testclient import TestClient
 
 from riskid.app import TITLE, app
 
-client = TestClient(app)
+# The workbench answers only to loopback Host headers (SPEC.md section 10), so
+# the client uses the address `riskid serve` listens on.
+client = TestClient(app, base_url="http://127.0.0.1:8765")
 
 
 def _find_riskid_script():

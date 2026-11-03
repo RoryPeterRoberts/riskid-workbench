@@ -4,7 +4,7 @@ The fixture organisation is three systems standing in for a realistic
 portfolio:
 
 * a **credit-scoring model** the organisation bought and configured, where it
-  is the deployer and the Article 6 outcome is high-risk;
+  is the deployer and the Article 6 outcome is high-risk (Annex III);
 * a **customer-service chatbot** it deploys, carrying the Article 50 duty;
 * a **CV-screening tool** that is still in pilot well past its end date.
 
@@ -53,7 +53,7 @@ SYSTEMS = (
         vendor_or_built="bought and configured",
         supplier="Meridian Financial Systems",
         role_under_act="deployer",
-        article_6_outcome="high-risk",
+        article_6_outcome="high-risk: Annex III",
         article_6_record_ref="AIA-2026-014",
         owner="Head of Lending",
         model_owner="Data Science Team",
@@ -69,6 +69,7 @@ SYSTEMS = (
         model_provider="OpenAI",
         model_name="gpt-4o",
         role_under_act="deployer",
+        article_6_outcome="no further class",
         article_50_duty="yes",
         owner="Customer Experience Lead",
         lifecycle_stage="operation and monitoring",
@@ -81,6 +82,7 @@ SYSTEMS = (
         vendor_or_built="bought",
         supplier="TalentGraph",
         role_under_act="deployer",
+        article_6_outcome="high-risk: Annex III",
         owner="Head of Talent Acquisition",
         lifecycle_stage="verification and validation",
         pilot_end_date="2026-06-30",

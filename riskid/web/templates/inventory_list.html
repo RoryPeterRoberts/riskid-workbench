@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+{% if saved %}<p class="notice">Saved {{ saved }}.</p>{% endif %}
+<p class="actions"><a class="button" href="/inventory/new">Add a system</a></p>
+
+{% if rows %}
+<table class="grid">
+  <thead>
+    <tr><th>ID</th><th>System</th><th>Owner</th><th>Role under the Act</th>
+        <th>Article 6 outcome</th><th>Stage</th><th>Flags</th></tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}{% set s = row.system %}
+    <tr>
+      <td><a href="/inventory/{{ s.id }}">{{ s.id }}</a></td>
+      <td>{{ s.name }}{% if s.function %}<br><small>{{ s.function }}</small>{% endif %}</td>
+      <td>{{ s.owner or "" }}</td>
+      <td>{{ s.role_under_act or "" }}</td>
+      <td>{{ s.article_6_outcome or "" }}{% if s.article_50_duty %}<br><small>Article 50: {{ s.article_50_duty }}</small>{% endif %}</td>
+      <td>{{ s.lifecycle_stage or "" }}</td>
+      <td>{% if row.pilot_overdue %}<span class="flag">Pilot overdue</span><br><small>OPS-08: the pilot ended {{ s.pilot_end_date }} and the system is still before deployment</small>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No systems yet. Add the first one: the form will not save without an owner, a role under the Act and an Article 6 outcome.</p>
+{% endif %}
+
+<section id="discovery">
+  <h2>Discovery ratio</h2>
+  <p>Tools found by the discovery methods against tools on the inventory, entered each quarter (OPS-07).</p>
+  {% if discovery %}
+  <table class="grid">
+    <thead><tr><th>Quarter</th><th>Tools found</th><th>Tools inventoried</th><th>Found per inventoried</th><th>Methods</th></tr></thead>
+    <tbody>
+    {% for d in discovery %}
+      <tr><td>{{ d.quarter }}</td><td>{{ d.found }}</td><td>{{ d.inventoried }}</td><td>{{ d.ratio }}</td><td>{{ d.method or "" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% if discovery_reasons %}
+  <ul class="reasons" role="alert">{% for r in discovery_reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+  {% endif %}
+  <form method="post" action="/inventory/discovery" class="inline">
+    <label>Quarter <input name="quarter" placeholder="2026-Q4" value="{{ discovery_values.quarter or '' }}"></label>
+    <label>Tools found <input name="found" inputmode="numeric" value="{{ discovery_values.found or '' }}"></label>
+    <label>Tools inventoried <input name="inventoried" inputmode="numeric" value="{{ discovery_values.inventoried or '' }}"></label>
+    <label>Methods <input name="method" placeholder="expenses, identity provider" value="{{ discovery_values.method or '' }}"></label>
+    <button type="submit">Record</button>
+  </form>
+</section>
+{% endblock %}

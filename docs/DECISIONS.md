@@ -46,3 +46,37 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   `verification and validation`, still before deployment. The credit-scoring
   model and the chatbot sit at `operation and monitoring` with no
   `pilot_end_date`, so neither is flagged. 2026-11-03.
+- round 4: `riskid/web/static/htmx.min.js` is htmx.org 2.0.11 `dist/htmx.min.js`
+  (52,182 bytes, sha256 `d6fdc75f204e6bdefa99b69bf1e6d4ac69b8a364f77929f45c13476b4000f717`),
+  taken from the npm registry tarball after checking its sha512 against the
+  registry's published integrity. Licence 0BSD. A test pins the hash. HTMX is
+  named in `PLAN.md` round 4, so this adds no dependency. 2026-11-03.
+- round 4: the Inventory form also refuses a save without a name, besides the
+  owner, role and Article 6 outcome that SPEC.md section 3 requires: a system
+  with no name cannot be listed once. 2026-11-03.
+- round 4: the Article 6 outcome is one of six values, one per end of chapter
+  5's classification steps: out of scope, prohibited, high-risk: Annex I,
+  high-risk: Annex III, not high-risk: Article 6(3), no further class. The
+  fixture's three systems now carry one each (credit scoring and CV screening
+  high-risk: Annex III; the chatbot no further class, with its Article 50
+  duty). 2026-11-03.
+- round 4: SPEC.md 6.2 asks for the discovery ratio per quarter but section 4
+  has no entity for it. The store gains a `discovery` entity (quarter, tools
+  found, tools inventoried, methods), recorded as events like everything
+  else. 2026-11-03.
+- round 4: until Settings brings the list of people (round 14), the person
+  recorded on each change is `RISKID_ACTOR` if set, else the operating-system
+  account (`riskid/config.py`). 2026-11-03.
+- round 4: two guards keep the workbench local (SPEC.md section 10): the Host
+  header must be loopback (or the host given to `riskid serve --host`), which
+  stops DNS rebinding, and a change whose Origin header names another site is
+  refused with 403. 2026-11-03.
+- round 4: the web routes are `async`, as is the store dependency, so each
+  request opens, uses and closes its SQLite connection on one thread.
+  2026-11-03.
+- round 4: the root route still returns the title as JSON (the round 0 test).
+  The Dashboard of SPEC.md 6.1 has no round in `PLAN.md`; until it has one,
+  the header's product name links to the Inventory. 2026-11-03.
+- round 4: the timestamp helpers moved from `riskid/store.py` to
+  `riskid/timestamps.py`, unchanged, because the round 3 fix took store.py to
+  408 lines, over rule 5's limit of 400. 2026-11-03.
