@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riskid-workbench"
+version = "0.1.0"
+description = "The AI risk identification method as software."
+readme = "README.md"
+requires-python = ">=3.11"
+# Dependency set fixed by docs/PLAN.md section 2. No others without a line in
+# docs/DECISIONS.md (rule 10 of PLAN.md section 1).
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "jinja2",
+    "python-multipart",
+    "openpyxl",
+    "matplotlib",
+    "weasyprint",
+    "python-docx",
+    "pytest",
+    "httpx",
+]
+
+[project.scripts]
+riskid = "riskid.cli:main"
+
+[tool.setuptools]
+packages = ["riskid"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
