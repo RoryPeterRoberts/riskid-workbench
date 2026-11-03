@@ -17,12 +17,13 @@ from riskid import rules
 from riskid.model import Event, System
 from riskid.store import Store
 from riskid.web import get_store, render
-from riskid.web.system_form import B1_ROWS, REQUIRED_FIELDS, form_values, parse_system_form
+from riskid.web.system_form import (B1_ROWS, REQUIRED_FIELDS, WHOLE_NUMBER, form_values,
+                                     parse_system_form)
 
 router = APIRouter()
 
-_SYSTEM_ID = re.compile(r"^SYS-\d{3,}$")
-_QUARTER = re.compile(r"^\d{4}-Q[1-4]$")
+_SYSTEM_ID = re.compile(r"SYS-[0-9]{3,}")
+_QUARTER = re.compile(r"[0-9]{4}-Q[1-4]")
 
 
 def _systems(store: Store) -> dict:
@@ -43,7 +44,7 @@ def _list_page(request, store, status_code=200, **context):
     saved = request.query_params.get("saved", "")
     return render(request, "inventory_list.html", "inventory", status_code=status_code,
                   rows=rows, discovery=_discovery_rows(store),
-                  saved=saved if _SYSTEM_ID.match(saved) else None, **context)
+                  saved=saved if _SYSTEM_ID.fullmatch(saved) else None, **context)
 
 
 def _form_page(request, system_id, values, reasons, status_code=200):
@@ -87,11 +88,11 @@ async def discovery_record(request: Request, store: Store = Depends(get_store)):
     quarter = values.get("quarter", "").strip()
     found, inventoried = values.get("found", "").strip(), values.get("inventoried", "").strip()
     reasons = []
-    if not _QUARTER.match(quarter):
+    if not _QUARTER.fullmatch(quarter):
         reasons.append("Quarter: give it as year and quarter, for example 2026-Q4.")
-    if not found.isdigit():
+    if not WHOLE_NUMBER.fullmatch(found):
         reasons.append("Tools found: give a whole number, 0 or more.")
-    if not inventoried.isdigit() or int(inventoried) < 1:
+    if not WHOLE_NUMBER.fullmatch(inventoried) or int(inventoried) < 1:
         reasons.append("Tools inventoried: give a whole number, 1 or more.")
     if reasons:
         return _list_page(request, store, status_code=422,

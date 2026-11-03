@@ -38,6 +38,10 @@ async def get_store(request: Request):
     if path is None:
         raise HTTPException(503, "No organisation file is open: start the workbench "
                                  "with `riskid serve <file>`.")
+    if not path.exists():
+        # Opening it would create an empty file and save into that instead.
+        raise HTTPException(503, f"The organisation file {path} has gone; "
+                                 "restore it or start the workbench on another file.")
     store = Store(path)
     try:
         yield store

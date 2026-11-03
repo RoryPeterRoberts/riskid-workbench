@@ -308,3 +308,40 @@ def test_serve_starts_and_serves_the_inventory(empty_org):
     finally:
         proc.terminate()
         proc.wait(timeout=10)
+
+
+# --- fixes from the round 4 review ------------------------------------------
+
+def test_non_ascii_digits_are_refused_not_a_crash(empty_org):
+    client = _client(empty_org)
+    resp = client.post("/inventory", data=dict(COMPLETE, users="analyst, ²"))
+    assert resp.status_code == 422
+    resp = client.post("/inventory/discovery",
+                       data={"quarter": "2026-Q4", "found": "²", "inventoried": "3"})
+    assert resp.status_code == 422
+    resp = client.post("/inventory/discovery",
+                       data={"quarter": "٢٠٢٦-Q4", "found": "4", "inventoried": "3"})
+    assert resp.status_code == 422
+
+
+def test_a_missing_file_is_not_recreated(tmp_path):
+    path = tmp_path / "gone.riskid"
+    init(path).close()
+    client = _client(path)
+    path.unlink()
+    assert client.get("/inventory").status_code == 503
+    assert client.post("/inventory", data=COMPLETE).status_code == 503
+    assert not path.exists()
+
+
+def test_actor_falls_back_when_the_account_has_no_name(monkeypatch):
+    from riskid import config
+
+    def no_name():
+        raise OSError("no user name")
+
+    monkeypatch.delenv("RISKID_ACTOR", raising=False)
+    monkeypatch.setattr(config.getpass, "getuser", no_name)
+    assert config.default_actor() == config.UNKNOWN_ACTOR
+    monkeypatch.setenv("RISKID_ACTOR", "Ann Other")
+    assert config.default_actor() == "Ann Other"

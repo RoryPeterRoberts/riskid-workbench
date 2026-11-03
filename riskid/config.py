@@ -14,6 +14,16 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 
 
+# Recorded when the operating system cannot name the account (getpass raises).
+UNKNOWN_ACTOR = "unnamed local user"
+
+
 def default_actor() -> str:
     """The person recorded on each change made through the screens."""
-    return os.environ.get("RISKID_ACTOR", "").strip() or getpass.getuser()
+    named = os.environ.get("RISKID_ACTOR", "").strip()
+    if named:
+        return named
+    try:
+        return getpass.getuser()
+    except (OSError, KeyError, ImportError):
+        return UNKNOWN_ACTOR

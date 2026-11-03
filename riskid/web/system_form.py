@@ -12,6 +12,7 @@ use dotted names (``data.personal``, ``impact_assessments.DPIA.ref``).
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import date
 
@@ -30,6 +31,9 @@ ARTICLE_6_OUTCOMES = (
     ("not high-risk: Article 6(3)", "Not high-risk: an Article 6(3) condition applies"),
     ("no further class", "No further class beyond Article 4 AI literacy"),
 )
+
+# A whole number in ASCII digits; str.isdigit() also accepts "²", which int() refuses.
+WHOLE_NUMBER = re.compile(r"[0-9]+")
 
 REASON_NAME = "System: give the system a name (B.1 field 1)."
 REASON_OWNER = "Owner: name the one person accountable for this system (B.1 field 10)."
@@ -188,7 +192,7 @@ def _parse_one(f: Field, raw: str):
             role, sep, number = line.rpartition(",")
             if not sep:
                 out.append({"role": line, "number": None})
-            elif role.strip() and number.strip().isdigit():
+            elif role.strip() and WHOLE_NUMBER.fullmatch(number.strip()):
                 out.append({"role": role.strip(), "number": int(number)})
             else:
                 return None, "Users: give each line as role, number (for example: credit analyst, 12)."
