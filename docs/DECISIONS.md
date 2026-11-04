@@ -309,7 +309,8 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   system ("Any line": any live line). A system needs a contract when it is
   bought, or built on a model provider's model. "The share of AI contracts
   that meet the clause standard" (chapter 12) counts recorded contracts with
-  no gap. 2026-11-04.
+  no gap, on systems with at least one live line: a system with none has
+  nothing yet to judge its contract by. 2026-11-04.
 - round 14: people are entities (P-nnn). The person recording is chosen in
   Settings for this run of the workbench and is not itself an event, since
   every change records its actor. The organisation form keeps a field it did
