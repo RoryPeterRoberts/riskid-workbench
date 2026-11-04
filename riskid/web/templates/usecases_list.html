@@ -22,7 +22,9 @@
       <td>{{ u.system_id }}<br><small>{{ names.get(u.system_id, "") }}</small></td>
       <td>{{ u.fields_.definition or "" }}</td>
       <td><small>{{ u.source }}</small></td>
-      <td>{% if u.status == "accepted" %}accepted as <strong>{{ u.line_id }}</strong>
+      <td>{% if u.status == "accepted" %}accepted as <strong>{{ u.line_id }}</strong>{% if u.ai_draft %}<br><small>drafted by {{ u.ai_draft.model }}, accepted by {{ u.ai_draft.accepted_by }}</small>{% endif %}
+          {% elif u.status == "draft" %}<span class="flag">draft</span> <small>by the assistant; Very Low until accepted</small>
+          {% elif u.status == "discarded" %}<small>draft discarded</small>
           {% else %}<span class="reasons">returned</span><ul class="why-list reasons">{% for r in u.return_reason.split("\n") %}<li>{{ r }}</li>{% endfor %}</ul>{% endif %}</td>
     </tr>
   {% endfor %}

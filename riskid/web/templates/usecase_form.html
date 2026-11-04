@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block heading %}{% if uc_id %}Use case {{ uc_id }}: returned for correction{% else %}New use case{% endif %} for {{ system.id }} {{ system.name }}{% endblock %}
+{% block heading %}{% if draft %}Use case {{ uc_id }}: a draft by the assistant{% elif uc_id %}Use case {{ uc_id }}: returned for correction{% else %}New use case{% endif %} for {{ system.id }} {{ system.name }}{% endblock %}
 {% block content %}
 {% if reasons %}
 <div class="returned" role="alert">
@@ -7,8 +7,17 @@
   <ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul>
 </div>
 {% endif %}
+{% if draft %}
+<div class="draft" role="note">
+  <p><strong>Drafted by the assistant</strong> ({{ draft.model }}, version {{ draft.version }}, {{ draft.date }}): {{ draft.fields|join(", ") }}.
+  Until a person accepts it, it counts as <strong>{{ counts_as }}</strong> data quality (chapter 14). Check each field against its source, name the owner and rate the data quality, then submit to accept it; or discard it.</p>
+  <form method="post" action="/usecases/{{ uc_id }}/discard" class="inline-button"><button type="submit">Discard the draft</button></form>
+</div>
+{% elif not uc_id %}
+<div class="assistant">{% if assistant_on %}<form method="post" action="/usecases/draft" class="inline-button"><input type="hidden" name="system_id" value="{{ system.id }}"><button type="submit">Draft with the assistant</button></form> It sends this system's header lines and the taxonomy codes, nothing else, to {{ assistant_endpoint }}.{% else %}<p>The assistant is off; <a href="/settings#assistant">Settings</a> switches it on.</p>{% endif %}</div>
+{% endif %}
 <p>Complete one template for every risk, with the person who operates the system. The examples in grey are the book's MOD-05.</p>
-<form method="post" action="{% if uc_id %}/usecases/{{ uc_id }}{% else %}/usecases{% endif %}" class="b1">
+<form method="post" action="{% if uc_id %}/usecases/{{ uc_id }}{% else %}/usecases{% endif %}" class="b1{% if draft %} drafted{% endif %}">
   <input type="hidden" name="system_id" value="{{ system.id }}">
   <fieldset class="b1-row">
     <h3>System header</h3>
@@ -67,6 +76,6 @@
     {% endif %}
   </fieldset>
   {% endfor %}
-  <p class="actions"><button type="submit">Submit</button> <a href="/usecases">Cancel</a></p>
+  <p class="actions"><button type="submit">{% if draft %}Accept and submit{% else %}Submit{% endif %}</button> <a href="/usecases">Cancel</a></p>
 </form>
 {% endblock %}

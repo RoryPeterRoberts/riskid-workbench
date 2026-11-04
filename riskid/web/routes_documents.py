@@ -23,7 +23,8 @@ from riskid.web import get_store, render
 router = APIRouter()
 TYPES = {"xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
          "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-         "csv": "text/csv; charset=utf-8", "pdf": "application/pdf", "zip": "application/zip"}
+         "csv": "text/csv; charset=utf-8", "pdf": "application/pdf", "zip": "application/zip",
+         "riskid": "application/octet-stream"}
 
 
 def send_document(request, store, kind: str, name: str, fmt: str, body, prov: dict):

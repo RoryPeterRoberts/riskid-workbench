@@ -1,0 +1,185 @@
+{
+ "source": "Appendix B, B.9 AI Contract Clause Checklist (docs/BOOK_TABLES.md)",
+ "intro": "For contracts with suppliers of AI models, systems or services (Chapters 5 and 7). The clauses answer LEG-12, \"Contracts that leave the organisation holding the vendor's risk\", and the controls of A.10.2 and A.10.3.",
+ "clauses": [
+  {
+   "n": 1,
+   "clause": "Notice of changes",
+   "covers": "Advance notice of model or version changes; the right to pin a version; a deprecation timetable",
+   "lines": [
+    "MOD-05",
+    "OPS-05"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3; Article 25(4)"
+  },
+  {
+   "n": 2,
+   "clause": "Documentation",
+   "covers": "Model card, evaluation results, known limits, instructions for use, and for general-purpose models the training-content summary",
+   "lines": [
+    "TRA-04",
+    "DAT-04"
+   ],
+   "any_line": false,
+   "hooks": "Articles 13, 53(1)(d)"
+  },
+  {
+   "n": 3,
+   "clause": "Use of your data",
+   "covers": "No training on your prompts, outputs or data without agreement; retention limits; deletion on exit",
+   "lines": [
+    "DAT-07",
+    "LEG-05"
+   ],
+   "any_line": false,
+   "hooks": "GDPR Article 5"
+  },
+  {
+   "n": 4,
+   "clause": "Audit and testing",
+   "covers": "The right to run your own tests and to receive the supplier's test results and incident history",
+   "lines": [
+    "TRA-04",
+    "MOD-08"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3"
+  },
+  {
+   "n": 5,
+   "clause": "Incident notification",
+   "covers": "A notice period for incidents and malfunctions that is shorter than your own reporting deadlines; cooperation in investigations",
+   "lines": [],
+   "any_line": true,
+   "hooks": "Articles 26(5), 73"
+  },
+  {
+   "n": 6,
+   "clause": "Logs",
+   "covers": "Access to logs in a usable form, and the retention period",
+   "lines": [
+    "TRA-07"
+   ],
+   "any_line": false,
+   "hooks": "Articles 12, 26(6); A.6.2.8"
+  },
+  {
+   "n": 7,
+   "clause": "Sub-suppliers",
+   "covers": "Disclosure of sub-processors and upstream model providers, and notice of changes",
+   "lines": [
+    "OPS-01",
+    "SEC-09"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3; DORA Articles 28 to 30"
+  },
+  {
+   "n": 8,
+   "clause": "Liability and indemnity",
+   "covers": "Allocation of liability; intellectual property indemnity; limits on caps for data and regulatory loss",
+   "lines": [
+    "LEG-06",
+    "LEG-11",
+    "LEG-12"
+   ],
+   "any_line": false,
+   "hooks": "A.10.2"
+  },
+  {
+   "n": 9,
+   "clause": "Service levels",
+   "covers": "Availability, latency, rate limits, support and fallback",
+   "lines": [
+    "OPS-03"
+   ],
+   "any_line": false,
+   "hooks": "A.6.2.6"
+  },
+  {
+   "n": 10,
+   "clause": "Price protection",
+   "covers": "Notice of price changes; spend caps; consumption alerts",
+   "lines": [
+    "OPS-04"
+   ],
+   "any_line": false,
+   "hooks": "A.4"
+  },
+  {
+   "n": 11,
+   "clause": "Security",
+   "covers": "Security standards, vulnerability disclosure, data location and transfer terms",
+   "lines": [
+    "SEC-09",
+    "SEC-10"
+   ],
+   "any_line": false,
+   "hooks": "NIS2 Article 21"
+  },
+  {
+   "n": 12,
+   "clause": "Exit and portability",
+   "covers": "Return of data, migration help, a transition period, and a right to terminate on regulatory change or material change to the model",
+   "lines": [
+    "OPS-02"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3; DORA Article 28"
+  },
+  {
+   "n": 13,
+   "clause": "Compliance warranties",
+   "covers": "The supplier's classification of the system, no prohibited practices, conformity and registration where required",
+   "lines": [
+    "LEG-07",
+    "LEG-08"
+   ],
+   "any_line": false,
+   "hooks": "Articles 5, 6, 49"
+  },
+  {
+   "n": 14,
+   "clause": "Oversight support",
+   "covers": "Instructions, oversight tooling and an explanation capability",
+   "lines": [
+    "HUM-07",
+    "TRA-02"
+   ],
+   "any_line": false,
+   "hooks": "Articles 13, 14, 86"
+  },
+  {
+   "n": 15,
+   "clause": "Fairness evidence",
+   "covers": "Performance results by group, and the supplier's bias testing method",
+   "lines": [
+    "FAI-04"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3"
+  },
+  {
+   "n": 16,
+   "clause": "Use restrictions",
+   "covers": "Intended-use limits, prohibited uses, and the supplier's monitoring of misuse",
+   "lines": [
+    "HUM-03",
+    "HUM-04"
+   ],
+   "any_line": false,
+   "hooks": "A.9.4"
+  },
+  {
+   "n": 17,
+   "clause": "Change of control",
+   "covers": "Notice and termination rights if the supplier is acquired or changes its terms",
+   "lines": [
+    "OPS-02"
+   ],
+   "any_line": false,
+   "hooks": "A.10.3"
+  }
+ ]
+}

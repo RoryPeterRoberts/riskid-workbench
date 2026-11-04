@@ -115,3 +115,9 @@ def load_checklist() -> list[dict]:
     import json
 
     return json.loads((DATA_DIR / "checklist.json").read_text(encoding="utf-8"))["steps"]
+
+
+def load_contract_clauses() -> list[dict]:
+    """The 17 clauses of the B.9 contract checklist with their register lines (``contracts.json``)."""
+    import json
+    return json.loads((DATA_DIR / "contracts.json").read_text(encoding="utf-8"))["clauses"]

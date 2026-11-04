@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p><a href="/contracts">All contracts</a></p>
+<h2>{{ system.id }} {{ system.name }}</h2>
+<p class="record">Supplier: {{ system.supplier or "none recorded" }}{% if system.model_provider %}; model provider: {{ system.model_provider }}{% endif %}{% if system.contract_ref %}; contract in the inventory: {{ system.contract_ref }}{% endif %}. Live lines on this system: {{ live|join(", ") if live else "none" }}.</p>
+
+<section class="stage" id="gaps">
+  <h2>Gaps against lines</h2>
+  {% if gaps %}<table class="grid">
+    <thead><tr><th>Clause</th><th>Status</th><th>Live lines it answers</th></tr></thead>
+    <tbody>{% for clause, status, lines in gaps %}<tr><td>{{ clause.n }}. {{ clause.clause }}</td><td>{{ status }}</td>
+      <td>{% if clause.any_line %}any line ({{ lines|length }} live){% else %}{{ lines|join(", ") }}{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>{% else %}<p class="empty">No gap: every clause that answers a live line on this system is present.</p>{% endif %}
+</section>
+
+<section class="stage" id="checklist">
+  <h2>B.9 checklist</h2>
+  <form method="post" action="/contracts/{{ system.id }}">
+    <table class="grid">
+      <thead><tr><th>Clause</th><th>What it should cover</th><th>Lines</th><th>Hooks</th><th>In the contract</th></tr></thead>
+      <tbody>{% for clause in clauses %}{% set key = "clause_" ~ clause.n %}
+      <tr><td>{{ clause.n }}. {{ clause.clause }}</td><td>{{ clause.covers }}</td>
+        <td>{% if clause.any_line %}Any line{% else %}{% for l in clause.lines %}{% if l in live %}<strong>{{ l }}</strong>{% else %}{{ l }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</td>
+        <td><small>{{ clause.hooks }}</small></td>
+        <td><select name="{{ key }}" aria-label="Clause {{ clause.n }}"><option value="">not reviewed</option>{% for s in statuses %}<option value="{{ s }}"{% if values.get(key) == s %} selected{% endif %}>{{ s }}</option>{% endfor %}</select></td></tr>{% endfor %}</tbody>
+    </table>
+    <div class="inline-fields">
+      <label>Contract reference <input name="reference" value="{{ values.get("reference", contract.reference or "") }}"></label>
+      <label>Note <input name="gap_note" size="48" value="{{ values.get("gap_note", contract.gap_note or "") }}"></label>
+      <button type="submit">Record</button>
+    </div>
+  </form>
+  <p><small>Lines in bold are live on this system.</small></p>
+</section>
+{% endblock %}

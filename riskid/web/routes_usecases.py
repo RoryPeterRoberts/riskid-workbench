@@ -5,6 +5,13 @@ and can be corrected and resubmitted on the same record (UC-nnn). One
 accepted becomes a candidate register line with source bottom-up: a new
 ORG-nnn line, or the library ID given in field 1; a risk already in the
 register is supported by the submission rather than entered twice.
+
+With the assistant on, a use case can be drafted from the system's header
+lines (SPEC.md section 8). The draft is recorded with status ``draft`` and
+``ai_draft`` (model, version, date, the fields drafted), counts as Very Low
+data quality until a person accepts it (SPEC.md 5.9), and is shown in the form
+to accept as it stands, edit, or discard. Submitting it is the acceptance: the
+person is recorded in ``ai_draft`` and the submission is checked as any other.
 """
 
 from __future__ import annotations
@@ -13,7 +20,10 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from starlette.concurrency import run_in_threadpool
 
+from riskid import rules
+from riskid.ai import adapter
 from riskid.model import Event, RegisterLine, UseCase
 from riskid.propose import annex_a_refs
 from riskid.store import Store
@@ -45,24 +55,30 @@ def _known_lines(store: Store) -> dict:
     return known
 
 
-def _form_page(request, store, system, values, reasons, uc_id=None, status_code=200):
+def _form_page(request, store, system, values, reasons, uc_id=None, status_code=200, draft=None):
     taxonomy = sorted(store.taxonomy(), key=lambda t: [int(p) for p in t["l2_code"].split(".")])
-    return render(request, "usecase_form.html", "usecases", status_code=status_code,
+    settings = adapter.assistant_settings(store.state())
+    on = adapter.is_on(settings)
+    counts_as = (rules.ai_draft_quality({"ai_draft": draft, "data_quality": values.get("data_quality")})
+                 if draft else None)
+    return render(request, "usecase_form.html", "usecases", status_code=status_code, draft=draft,
+                  counts_as=counts_as, assistant_on=on, assistant_endpoint=settings.get("endpoint"),
                   system=system, values=values, reasons=reasons, uc_id=uc_id, headers=HEADERS,
                   fields=FIELDS, taxonomy=taxonomy, roles=ROLES, stages=LIFECYCLE_STAGES,
                   sources=SOURCES, data_quality=DATA_QUALITY, control_types=CONTROL_TYPES,
                   control_rows=range(1, CONTROL_ROWS + 1), control_examples=CONTROL_EXAMPLES)
 
 
-def _submit(request, store, system, values, uc_id=None):
+def _submit(request, store, system, values, uc_id=None, ai_draft=None):
     """Check a submission, record it, and on acceptance record its register line."""
     record, reasons = parse_usecase(values, _taxonomy(store), _known_lines(store))
     actor = request.app.state.actor
     new_record = uc_id is None
     uc_id = uc_id or store.next_id("usecase", "UC")
     usecase = UseCase(system_id=system["id"], submitted_by=actor, date=date.today().isoformat(),
-                      **record)
-    reason = "submitted" if new_record else "resubmitted after return"
+                      ai_draft=ai_draft or {}, **record)
+    reason = ("submitted" if new_record else "draft accepted and submitted" if ai_draft
+              else "resubmitted after return")
     if reasons:
         # One reason per line: a reason may itself contain a semicolon.
         usecase.status, usecase.return_reason = "returned", "\n".join(reasons)
@@ -131,12 +147,77 @@ async def usecase_create(request: Request, store: Store = Depends(get_store)):
     return _submit(request, store, _system(store, values.get("system_id", "")), values)
 
 
+def _draft_values(draft: dict, headers: dict) -> dict:
+    """The drafted fields as form values beside the header lines; owner and rating stay for the person."""
+    values = {f"header_{k}": v for k, v in headers.items()}
+    values.update({k: draft.get(k) or "" for k in ("risk_id", "taxonomy", "definition", "drivers_direct",
+                                                    "drivers_indirect", "metrics", "qualitative",
+                                                    "indicators", "data_quality_basis")})
+    for i, control in enumerate(draft.get("controls") or [], start=1):
+        values.update({f"control_{i}_{k}": control.get(k) or "" for k in ("name", "type", "evidence")})
+    return values
+
+
+@router.post("/usecases/draft")
+async def usecase_draft(request: Request, store: Store = Depends(get_store)):
+    values = await _submitted(request)
+    system = _system(store, values.get("system_id", ""))
+    settings = adapter.assistant_settings(store.state())
+    if not adapter.is_on(settings):
+        raise HTTPException(409, "The assistant is off; Settings switches it on.")
+    headers = header_defaults(system)
+    # Only what the new-use-case screen shows: the header lines and the taxonomy codes to choose from.
+    sent = {"header_lines": headers,
+            "taxonomy": {t["l2_code"]: t["l2"] for t in store.taxonomy()}}
+    actor = request.app.state.actor
+    try:
+        # A worker thread waits for the model, so the workbench stays responsive meanwhile.
+        result = await run_in_threadpool(adapter.draft, settings, "use_case", sent)
+    except adapter.AssistantError as exc:
+        store.append(Event(entity="ai_request", entity_id=store.next_id("ai_request", "AIR"),
+                           new={"kind": "use_case", "model": settings.get("model"), "sent": sorted(sent),
+                                "outcome": str(exc)}, actor=actor, reason="assistant request failed"))
+        return _form_page(request, store, system, {f"header_{k}": v for k, v in headers.items()},
+                          [str(exc)], status_code=502)
+    form = _draft_values(result["draft"], headers)
+    record, _ = parse_usecase(form, _taxonomy(store), _known_lines(store))
+    today = date.today().isoformat()
+    drafted = sorted(k for k, v in result["draft"].items() if v)
+    ai_draft = {"model": result["model"], "version": result["version"], "date": today, "fields": drafted}
+    uc_id = store.next_id("usecase", "UC")
+    with store.transaction():
+        store.append(Event(entity="ai_request", entity_id=store.next_id("ai_request", "AIR"),
+                           new={"kind": "use_case", "model": result["model"], "version": result["version"],
+                                "tokens": result["tokens"], "sent": sorted(sent), "outcome": f"draft {uc_id}"},
+                           actor=actor, reason=f"assistant drafted {uc_id} for {system['id']}"))
+        store.append(Event(entity="usecase", entity_id=uc_id,
+                           new=UseCase(system_id=system["id"], date=today, status="draft", ai_draft=ai_draft,
+                                       **record).to_dict(),
+                           actor=actor, reason=f"drafted by the assistant at the request of {actor}",
+                           ai_draft={"model": result["model"], "version": result["version"]}))
+    return RedirectResponse(f"/usecases/{uc_id}", status_code=303)
+
+
+@router.post("/usecases/{uc_id}/discard")
+async def usecase_discard(uc_id: str, request: Request, store: Store = Depends(get_store)):
+    await request.form()
+    usecase = store.state().get("usecase", {}).get(uc_id)
+    if usecase is None or usecase["status"] != "draft":
+        raise HTTPException(409, f"Only a draft is discarded; {uc_id} is not one.")
+    store.append(Event(entity="usecase", entity_id=uc_id, field="status", old="draft", new="discarded",
+                       actor=request.app.state.actor, reason="assistant draft discarded"))
+    return RedirectResponse("/usecases", status_code=303)
+
+
 @router.get("/usecases/{uc_id}")
 async def usecase_view(uc_id: str, request: Request, store: Store = Depends(get_store)):
     usecase = store.state().get("usecase", {}).get(uc_id)
     if usecase is None:
         raise HTTPException(404, f"No use case {uc_id}.")
     system = _system(store, usecase["system_id"])
+    if usecase["status"] == "draft":
+        return _form_page(request, store, system, form_values(usecase), [], uc_id=uc_id,
+                          draft=usecase["ai_draft"])
     if usecase["status"] == "returned":
         reasons = usecase["return_reason"].split("\n")
         return _form_page(request, store, system, form_values(usecase), reasons, uc_id=uc_id)
@@ -150,8 +231,11 @@ async def usecase_resubmit(uc_id: str, request: Request, store: Store = Depends(
     usecase = store.state().get("usecase", {}).get(uc_id)
     if usecase is None:
         raise HTTPException(404, f"No use case {uc_id}.")
-    if usecase["status"] != "returned":
-        raise HTTPException(409, f"{uc_id} was accepted as {usecase.get('line_id')}; "
-                                 "only a returned submission is resubmitted.")
+    if usecase["status"] not in ("returned", "draft"):
+        raise HTTPException(409, f"{uc_id} is {usecase['status']}; only a returned submission or a draft "
+                                 "is submitted again.")
     values = await _submitted(request)
-    return _submit(request, store, _system(store, usecase["system_id"]), values, uc_id=uc_id)
+    ai_draft = usecase.get("ai_draft") or None
+    if ai_draft and not ai_draft.get("accepted_by"):
+        ai_draft = dict(ai_draft, accepted_by=request.app.state.actor, accepted_date=date.today().isoformat())
+    return _submit(request, store, _system(store, usecase["system_id"]), values, uc_id=uc_id, ai_draft=ai_draft)

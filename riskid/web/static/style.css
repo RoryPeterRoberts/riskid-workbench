@@ -181,3 +181,13 @@ form.stacked button { justify-self: start; }
 form.inline select { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid #B9B3A0; border-radius: 3px; background: #fff; }
 .nowrap { white-space: nowrap; }
 section.step .why-list { margin-bottom: 0.5rem; }
+
+/* Contracts */
+.inline-fields { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin-top: 0.5rem; }
+.inline-fields label { display: flex; flex-direction: column; font-size: 0.9rem; }
+.inline-fields input, table.grid select { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid #B9B3A0; border-radius: 3px; background: #fff; }
+
+/* The assistant's drafts (SPEC.md section 8): shown in a draft colour until a person accepts them */
+:root { --draft: #E8F0FB; --draft-edge: #3A6EA5; }
+.draft { background: var(--draft); border-left: 4px solid var(--draft-edge); padding: 0.5rem 1rem; margin-bottom: 1rem; }
+form.b1.drafted .b1-row { background: var(--draft); }

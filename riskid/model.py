@@ -222,6 +222,7 @@ class UseCase(Model):
     return_reason: str = None
     source: str = None                   # the template or one of the ten sub-processes (ch 7)
     line_id: str = None                  # the register line it created or supports
+    ai_draft: dict = dfield(default_factory=dict)  # model, version, date, fields; accepted_by once accepted
 
 
 # --- Workshop (B.5) ---------------------------------------------------------
@@ -334,6 +335,14 @@ class Contract(Model):
     gap_note: str = None
 
 
+# --- Person (Settings: the people who record changes) ----------------------
+
+@dataclass
+class Person(Model):
+    name: str = None
+    role: str = None
+
+
 # --- Document / Event / DataPack -------------------------------------------
 
 @dataclass
@@ -372,5 +381,5 @@ class DataPack(Model):
 ENTITIES = (
     Organisation, System, TaxonomyLine, LibraryLine, RegisterLine, Assessment,
     Control, Indicator, UseCase, Workshop, Interaction, BowTie, Trigger,
-    CycleRun, Contract, Document, Event, DataPack,
+    CycleRun, Contract, Person, Document, Event, DataPack,
 )
