@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<nav class="tabs">
+  <a href="#match">1 Match</a><a href="#gap">2 Gap</a><a href="#challenge">3 Challenge</a><a href="#resolve">4 Resolve</a><a href="#record">5 Record</a>
+</nav>
+<p>{{ counts.lines }} lines in the register · {{ counts.open_gaps }} open gaps · {{ counts.open_disagreements }} open disagreements</p>
+
+<section class="stage" id="match">
+  <h2>1. Match</h2>
+  <p class="record">Top-down entries (the lines a closed workshop voted for) against bottom-up entries (accepted use cases), on the taxonomy node and the system. A top-down risk matched in several systems is itself information.</p>
+  {% if matches %}
+  <table class="grid">
+    <thead><tr><th>Node</th><th>Top-down</th><th>Bottom-up</th><th>Systems</th></tr></thead>
+    <tbody>{% for m in matches %}<tr>
+      <td>{{ m.l2 }}</td>
+      <td>{{ m.line_id }} {{ titles.get(m.line_id, "") }}<br><small>{{ m.source }}{% if m.voters %}, {{ m.voters }} voters{% endif %}; {{ m.systems|join(", ") }}</small></td>
+      <td>{% for bu in m.matched %}<div>{{ bu.source }} → {{ bu.line_id }} <small>{{ bu.system }}</small></div>{% else %}<span class="empty">none</span>{% endfor %}</td>
+      <td>{{ m.system_count }}</td>
+    </tr>{% endfor %}</tbody>
+  </table>
+  {% else %}<p class="empty">Nothing top-down yet: close a workshop to bring its voted lines here.</p>{% endif %}
+</section>
+
+<section class="stage" id="gap">
+  <h2>2. Gap</h2>
+  <p class="record">What is left unmatched in each direction, and lines neither track raised. A top-down risk with no bottom-up match may have no natural owner at all; a bottom-up risk missing from the workshop may be a symptom of something shared (chapter 8).</p>
+  {% if gaps %}
+  <table class="grid">
+    <thead><tr><th>Line</th><th>Risk</th><th>Node</th><th>System</th><th>Gap</th><th>Status</th></tr></thead>
+    <tbody>{% for g in gaps %}{% set r = resolutions.get(g.subject) %}<tr>
+      <td>{{ g.subject }}</td><td>{{ titles.get(g.subject, "") }}</td><td>{{ g.l2 }}</td><td>{{ g.systems|join(", ") }}</td>
+      <td><strong>{{ g.kind }}</strong><br><small>{{ g.detail }}</small></td>
+      <td>{% if r %}{{ done[r.disposition] }}{% if r.target %} {{ r.target }}{% endif %}<br><small>{{ r.reason }}; {{ r.decided_by }}, {{ r.date }}</small>{% else %}<span class="flag">open</span>{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table>
+  {% else %}<p class="empty">No gaps between the tracks.</p>{% endif %}
+  <h3>Blind spots</h3>
+  <p><small>Lines proposed for a system from the starting universe that are in neither track nor the register. Each receives a recorded reason: not applicable, covered by another line, or not previously considered, which is a finding.</small></p>
+  {% if blind_spots %}
+  <details class="removed"{% if blind_spots|length < 15 %} open{% endif %}><summary>{{ blind_spots|length }} blind spot candidates</summary>
+  <table class="grid">
+    <thead><tr><th>Line</th><th>Risk</th><th>Proposed for</th><th>Status</th></tr></thead>
+    <tbody>{% for b in blind_spots %}{% set r = resolutions.get(b.subject) %}<tr><td>{{ b.subject }}</td><td>{{ b.title }}</td><td>{{ b.systems|join(", ") }}</td>
+      <td>{% if r %}{{ done[r.disposition] }}<br><small>{{ r.reason }}; {{ r.decided_by }}, {{ r.date }}</small>{% else %}<span class="flag">blind spot: reason needed</span>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table></details>
+  {% else %}<p class="empty">None.</p>{% endif %}
+</section>
+
+<section class="stage" id="challenge">
+  <h2>3. Challenge</h2>
+  <p class="record">Structured sessions between workshop participants and system owners, chaired by the AI officer, with the disagreement log as the agenda. Evidence outranks opinion: a log extract, a test record or a contract clause outranks an owner's statement, which outranks a vendor's assurance.</p>
+  {% if agenda %}
+  <h3>From the workshops: seats that voted differently from the business owner</h3>
+  <table class="grid"><thead><tr><th>Workshop</th><th>Seat</th><th>Person</th><th>Line</th><th>Their votes</th><th>Owner's votes</th></tr></thead>
+    <tbody>{% for a in agenda %}<tr><td>{{ a.ws_id }}</td><td>{{ a.seat }}</td><td>{{ a.person }}</td><td>{{ a.candidate }}</td><td>{{ a.votes }}</td><td>{{ a.owner_votes }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+  <h3>Disagreement log</h3>
+  {% if disagreements %}
+  <table class="grid"><thead><tr><th>ID</th><th>Line</th><th>Held by</th><th>Majority score</th><th>Minority score</th><th>Dimension</th><th>Evidence</th><th>Status</th></tr></thead>
+    <tbody>{% for dl_id, d in disagreements %}<tr><td>{{ dl_id }}</td><td>{{ d.line_id }}</td><td>{{ d.holder }}</td><td>{{ d.majority_score or "" }}</td><td>{{ d.minority_score }}</td><td>{{ d.dimension }}</td><td>{{ d.evidence or "" }}</td><td>{{ d.status }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}<p class="empty">No disagreements logged.</p>{% endif %}
+  <form method="post" action="/reconcile/disagreements" class="inline">
+    <label>Line <input name="line_id" placeholder="MOD-05" size="8"></label>
+    <label>Held by <input name="holder" placeholder="the overseer"></label>
+    <label>Majority <input name="majority_score" inputmode="numeric" size="2"></label>
+    <label>Minority <input name="minority_score" inputmode="numeric" size="2"></label>
+    <label>Dimension <select name="dimension">{% for d in dimensions %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select></label>
+    <label>Evidence <input name="evidence"></label>
+    <button type="submit">Log it</button>
+  </form>
+</section>
+
+<section class="stage" id="resolve">
+  <h2>4. Resolve</h2>
+  <p class="record">Every gap and every disagreement gets one of five dispositions, with a named person and a date.</p>
+  <form method="post" action="/reconcile/resolve" class="b1">
+    <label class="field"><span>Gap or disagreement</span>
+      <select name="subject">
+        {% for g in open_gaps %}<option value="{{ g.subject }}">{{ g.subject }}: {{ g.kind }}</option>{% endfor %}
+        {% for dl_id, d in disagreements if d.status == "open" %}<option value="{{ dl_id }}">{{ dl_id }}: {{ d.line_id }}, {{ d.dimension }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field"><span>Disposition</span><select name="disposition">{% for key, label, _ in dispositions %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Reason</span><input name="reason"><small>Recorded with your name and today's date.</small></label>
+    <label class="field"><span>Merge into (for a merge)</span><input name="target" placeholder="HUM-01"></label>
+    <p class="actions"><button type="submit">Resolve</button></p>
+  </form>
+  {% if resolutions %}
+  <table class="grid"><thead><tr><th>Subject</th><th>Disposition</th><th>Reason</th><th>By</th><th>Date</th></tr></thead>
+    <tbody>{% for subject, r in resolutions.items() %}<tr><td>{{ subject }}</td><td>{{ done[r.disposition] }}{% if r.target %} {{ r.target }}{% endif %}</td><td>{{ r.reason }}</td><td>{{ r.decided_by }}</td><td>{{ r.date }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+</section>
+
+<section class="stage" id="record">
+  <h2>5. Record</h2>
+  <p class="record">The match table, the gap log, the disagreement log and the reconciled register as one dated record, signed by the executive accountable for AI risk. Repeat the steps until a pass finds no new gaps.</p>
+  <table class="grid">
+    <thead><tr><th>Line</th><th>Risk</th><th>Node</th><th>System</th><th>Owner</th><th>Track</th><th>Status</th></tr></thead>
+    <tbody>{% for line_id, l in register if l.status != "retired" %}<tr><td>{{ line_id }}</td><td>{{ titles.get(line_id, "") }}</td><td>{{ l.l2 }}</td><td>{{ l.system_id }}</td><td>{{ l.owner or "" }}</td>
+      <td>{% set t = tracks.get(line_id, []) %}{% if t|length == 2 %}both{% elif t %}{{ t|first }}{% else %}{{ l.source }} only{% endif %}</td><td>{{ l.status }}</td></tr>{% else %}<tr><td colspan="7" class="empty">The register is empty.</td></tr>{% endfor %}</tbody>
+  </table>
+  {% for run_id, run in runs %}<p><strong>{{ run_id }}</strong> {{ run.date }}: signed by {{ run.signed_by }}; present {{ run.present|join(", ") }}; {{ run.counts.lines }} lines, {{ run.counts.open_gaps }} open gaps, {{ run.counts.open_disagreements }} open disagreements.</p>{% endfor %}
+  <form method="post" action="/reconcile/record" class="inline">
+    <label>Present <input name="present" placeholder="names, separated by commas"></label>
+    <label>Signed by <input name="signed_by" placeholder="the accountable executive"></label>
+    <button type="submit">Record this pass</button>
+  </form>
+</section>
+{% endblock %}

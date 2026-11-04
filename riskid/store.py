@@ -61,7 +61,7 @@ _ENTITY_NAMES = (
     "organisation", "system", "register", "assessment", "control", "indicator",
     "usecase", "workshop", "interaction", "bowtie", "trigger", "cycle",
     "contract", "document", "library", "taxonomy", "pack",
-    "discovery",   # round 4: the Inventory's discovery ratio per quarter (SPEC.md 6.2)
+    "discovery", "disagreement", "resolution", "reconciliation",  # rounds 4 and 8
 )
 
 

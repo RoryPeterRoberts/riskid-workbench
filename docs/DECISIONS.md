@@ -153,3 +153,25 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   already in the register is left as it is; emerging risks stay in the
   workshop's taxonomy gap list. Attendance is set when the workshop opens and
   taken at stage 1; absent seats do not write lists or vote. 2026-11-04.
+- round 8: three new entities: `disagreement` (DL-nnn, the disagreement log
+  the plan asks for; SPEC.md section 4 carries a disagreement only inside an
+  assessment), `resolution` (one per gap or disagreement, keyed by its
+  subject) and `reconciliation` (RC-nnn, a signed pass). 2026-11-04.
+- round 8: top-down entries are the lines a closed workshop voted for and any
+  top-down register line; bottom-up entries are the accepted use cases. They
+  match on the Level 2 node and the system (chapter 8, step 1). A gap is what
+  is unmatched in either direction, or a line adopted from the library that
+  neither track raised. A blind spot is a line proposed for a system that is
+  not in the register; each needs a recorded reason (chapter 8). 2026-11-04.
+- round 8: every gap and disagreement gets one of chapter 8's five
+  dispositions, with a reason (required), the person and the date. On the
+  register: add makes the line active (adopting a blind spot first, for the
+  first system it was proposed for), merge retires it into the line named,
+  escalate and local make it active, not applicable retires it. For a blind
+  spot the other dispositions record the decision only. A candidate becomes
+  active here. A retired line or a resolved disagreement is not resolved
+  again. 2026-11-04.
+- round 8: a disagreement records who holds the minority view, the minority
+  score (1 to 5), the majority score if known, the dimension (an impact
+  dimension, likelihood or control effectiveness) and the evidence. The
+  workshops' seat differences are shown as the challenge agenda. 2026-11-04.
