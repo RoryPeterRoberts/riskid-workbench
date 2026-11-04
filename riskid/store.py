@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
 
@@ -24,12 +25,7 @@ from riskid.timestamps import now as _now
 from riskid.timestamps import replay_cutoff as _replay_cutoff
 from riskid.timestamps import stamp as _stamp
 
-__all__ = [
-    "Store",
-    "NoDeleteError",
-    "init",
-    "rebuild",
-]
+__all__ = ["Store", "NoDeleteError", "init", "rebuild"]
 
 
 class NoDeleteError(Exception):
@@ -89,6 +85,7 @@ class Store:
         self.path = Path(path)
         self._conn = sqlite3.connect(self.path)
         self._conn.row_factory = sqlite3.Row
+        self._depth = 0          # open transaction() blocks; append commits only at 0
         self._ensure_schema()
 
     # -- lifecycle ---------------------------------------------------------
@@ -105,6 +102,26 @@ class Store:
 
     def __exit__(self, *exc):
         self.close()
+
+    @contextmanager
+    def transaction(self):
+        """Append several events as one change: all of them are kept, or none.
+
+        Inside the block :meth:`append` does not commit; the outermost block
+        commits once at its end, or rolls everything back if an exception
+        leaves it.
+        """
+        self._depth += 1
+        try:
+            yield self
+        except BaseException:
+            self._depth -= 1
+            if self._depth == 0:
+                self._conn.rollback()
+            raise
+        self._depth -= 1
+        if self._depth == 0:
+            self._conn.commit()
 
     # -- the append-only audit trail ---------------------------------------
 
@@ -141,7 +158,8 @@ class Store:
                 event.evidence_ref, _json(event.ai_draft) if event.ai_draft else None,
             ),
         )
-        self._conn.commit()
+        if not self._depth:
+            self._conn.commit()
         return cur.lastrowid
 
     # -- projections (the live view) --------------------------------------
@@ -287,6 +305,10 @@ class Store:
         """
         if when is None:
             when = _now()
+        with self.transaction():
+            return self._load_packs(when, actor)
+
+    def _load_packs(self, when, actor) -> dict:
         version = importers.load_version()
         n_library = n_taxonomy = 0
         for line in importers.load_library():
@@ -352,7 +374,14 @@ def init(path: str | Path, when=None) -> Store:
             f"an organisation file already exists at {target}; "
             "rebuild it instead of re-initialising")
     store = Store(target)
-    store.load_packs(when=when)
+    try:
+        store.load_packs(when=when)
+    except BaseException:
+        # The file was created by this call and holds no events: remove it so
+        # a second `riskid init` is not refused by an empty file.
+        store.close()
+        target.unlink()
+        raise
     return store
 
 
