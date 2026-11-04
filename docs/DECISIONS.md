@@ -198,3 +198,22 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   reference script's drawing (band colours, IDs three to a row, the score in
   the corner), and are also given as a text table for screen readers.
   2026-11-04.
+- round 10: `Interaction` gains `mechanism` (required: "a cell with no
+  mechanism stays blank", chapter 10) and `delay`, and a fourth kind, none,
+  so a judgement of no effect is recorded rather than deleted. A link is one
+  entity per ordered pair (`FROM>TO`), re-recorded when the judgement changes;
+  the matrix is not symmetric. 2026-11-04.
+- round 10: the matrix's axes are the material lines (latest assessment) and
+  every line in a live link. Propagation and vulnerable nodes are lines with
+  two or more outgoing or incoming links. Candidate links are pairs of live
+  lines that cite the same Annex A control and have not been judged.
+  2026-11-04.
+- round 10: `BowTie` gains `owner` (chapter 10: one owner, the head of the
+  process) and `escalation_factors`; causes and preventive controls, and
+  consequences and recovery controls, are kept as row-aligned lists.
+  2026-11-04.
+- round 10: concentration counts systems per model (provider and name), per
+  model provider and per supplier, flags one model under several suppliers as
+  hidden concentration, and lists the Annex A controls several live lines
+  rely on (chapter 10's five forms; the reviewer pool and data-source forms
+  wait for those fields). 2026-11-04.

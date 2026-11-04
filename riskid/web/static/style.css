@@ -148,3 +148,17 @@ table.cells caption { caption-side: top; text-align: left; color: var(--muted); 
 .band-low { background: #c6e0b4; } .band-moderate { background: #ffe699; }
 .band-high { background: #f4b183; } .band-critical { background: #ff7c80; }
 dl.b6 dt { color: var(--navy); }
+
+/* Interact (round 10) */
+.scroll { overflow-x: auto; }
+table.matrix td, table.matrix th { text-align: center; min-width: 3.2rem; }
+table.matrix td strong { color: var(--navy); }
+.bowtie { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; }
+.bowtie .event { background: var(--navy); color: #fff; padding: 1rem; border-radius: 4px; max-width: 14rem; text-align: center; }
+@media (max-width: 900px) { .bowtie { grid-template-columns: 1fr; } }
+.bowtie-edit { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.bowtie-edit .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; margin-bottom: 0.3rem; }
+.bowtie-edit input { font: inherit; padding: 0.3rem; border: 1px solid #B9B3A0; border-radius: 3px; }
+.bowtie > * { min-width: 0; }
+.bowtie table.grid { table-layout: fixed; width: 100%; margin: 0; }
+.bowtie table.grid td, .bowtie table.grid td:first-child { white-space: normal; overflow-wrap: anywhere; }

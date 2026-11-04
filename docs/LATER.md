@@ -48,3 +48,8 @@ One line each (`PLAN.md` rule 11).
   (their sum can be material when no part is) is not applied.
 - round 9: the controls listed in an accepted use case could be offered as the
   line's controls on the Assess screen.
+- round 10: chapter 10's concentration by reviewer pool and by data source
+  needs those recorded per system; the inventory has users and data but not
+  as comparable keys.
+- round 10: B.3 field 11 (risk interaction summary) could be filled from the
+  matrix and the bow-tie reference on each line.

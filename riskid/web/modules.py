@@ -101,7 +101,21 @@ MODULES = {
               "model lowered about 39% of teacher-assessed grades in England; it was measured on "
               "the cohort, and the harm fell on individual students."),
     ),
+    "interact": Module(
+        key="interact",
+        title="Interact",
+        path="/interact",
+        chapter=10,
+        chapter_title="Risk Interaction: Bow-Ties, Cascades and Concentration",
+        template="The interaction matrix, the bow-tie and concentration analysis",
+        why=("The impact of a propagation node should reflect what it sets off as well as what "
+             "it does alone, and the likelihood of a vulnerable node should reflect every route "
+             "into it."),
+        case=("Knight Capital and Cruise: in August 2012 a trading release lost Knight Capital "
+              "about $440 million in 45 minutes; one Cruise robotaxi accident in October 2023 "
+              "ended in the wind-down of the business in December 2024."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact"))

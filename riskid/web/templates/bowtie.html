@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block heading %}Bow-tie {{ bt_id }}: {{ bowtie.line_id }}{% endblock %}
+{% block content %}
+<p>Owner: {{ bowtie.owner }} · <a href="/interact#bowties">All bow-ties</a></p>
+<div class="bowtie">
+  <table class="grid">
+    <thead><tr><th>Causes</th><th>Preventive controls</th></tr></thead>
+    <tbody>{% for c, p in zip(bowtie.causes, bowtie.preventive_controls) %}<tr><td>{{ c }}</td><td>{{ p }}</td></tr>{% endfor %}</tbody>
+  </table>
+  <div class="event"><strong>{{ bowtie.event }}</strong></div>
+  <table class="grid">
+    <thead><tr><th>Recovery controls</th><th>Consequences</th></tr></thead>
+    <tbody>{% for c, r in zip(bowtie.consequences, bowtie.recovery_controls) %}<tr><td>{{ r }}</td><td>{{ c }}</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% if bowtie.escalation_factors %}<h3>Escalation factors</h3><ul class="why-list">{% for f in bowtie.escalation_factors %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+<details><summary>Edit</summary>
+  {% with action = "/interact/bowties/" ~ bt_id, button = "Save changes" %}{% include "bowtie_form.html" %}{% endwith %}
+</details>
+{% endblock %}
