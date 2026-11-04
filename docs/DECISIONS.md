@@ -126,3 +126,30 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   bottom-up: a new ORG-nnn, or the library ID named in field 1. A risk already
   in the register is supported by the use case (`line_id`) and not entered
   twice. 2026-11-04.
+- round 7: `riskid/data/swift.json` is generated from the B.4 table in
+  `docs/BOOK_TABLES.md`, not retyped; a test compares the two prompt by prompt
+  and checks every named line is in the library. 2026-11-04.
+- round 7: `Workshop` gains `stage` (1 to 6, B.5), `status` (open | closed)
+  and `vote_allowance` (chapter 6: five to ten votes each; 1 to 20 accepted).
+  2026-11-04.
+- round 7: a workshop moves forward through the six stages and each stage
+  opens its input: pre-workshop lists at stage 1 only, SWIFT answers from
+  stage 3, emerging risks from stage 4, votes at stage 5 only, the gap review
+  at stage 6. A closed workshop takes no further change. 2026-11-04.
+- round 7: the pre-workshop lists are hidden everywhere until stage 2 (the
+  facilitator view, the record, the participant view), then shown as List A,
+  List B and so on, in an order set by their content rather than by who sent
+  them first. 2026-11-04.
+- round 7: the candidates for multivoting are the register lines named in
+  the lists, the lines of the prompts answered "not known", and the emerging
+  risks. They are ranked by how many participants voted for them, then by
+  votes placed (chapter 6); each participant's votes are kept and nothing is
+  averaged. Where the overseer, the DPO or security put votes on a candidate
+  and the business owner did not, or the reverse, the record lists it for the
+  disagreement log. 2026-11-04.
+- round 7: closing the workshop makes each voted library line not yet in the
+  register a candidate line with source top-down, for the first system in
+  scope that the line was proposed for (else the first system); a line
+  already in the register is left as it is; emerging risks stay in the
+  workshop's taxonomy gap list. Attendance is set when the workshop opens and
+  taken at stage 1; absent seats do not write lists or vote. 2026-11-04.

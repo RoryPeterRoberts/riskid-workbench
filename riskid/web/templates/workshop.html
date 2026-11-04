@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block heading %}Workshop {{ ws_id }}: {% if ws.status == "closed" %}closed{% else %}stage {{ ws.stage }} of 6, {{ stages[ws.stage - 1].name }}{% endif %}{% endblock %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p class="actions">
+  {% if ws.status == "open" and ws.stage < 6 %}<form method="post" action="/workshops/{{ ws_id }}/advance" class="inline-button"><button type="submit">Move to stage {{ ws.stage + 1 }}: {{ stages[ws.stage].name }}</button></form>{% endif %}
+  {% if ws.status == "open" and ws.stage == 6 %}<form method="post" action="/workshops/{{ ws_id }}/close" class="inline-button"><button type="submit">Close the workshop</button></form> <small>Voted register lines become top-down candidates; emerging risks go to the taxonomy gap list.</small>{% endif %}
+  <a href="/workshops/{{ ws_id }}/record">The record</a> · <a href="/workshops/{{ ws_id }}/participant">Participant entry</a> · <a href="/workshops">All workshops</a>
+</p>
+<blockquote class="strawman">The straw man is there to be challenged (B.5, stage 1).</blockquote>
+{% with editable = true %}{% include "workshop_sections.html" %}{% endwith %}
+{% endblock %}

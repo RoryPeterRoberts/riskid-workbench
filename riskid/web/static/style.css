@@ -124,3 +124,15 @@ details.coverage summary { cursor: pointer; font-weight: 600; }
 ul.checklist { columns: 2; margin: 0.5rem 0 0; padding-left: 1.2rem; }
 ul.checklist li.done::marker { content: "✓  "; color: #4C7A2A; }
 ul.checklist li.open { color: var(--muted); }
+
+/* Workshop (round 7) */
+section.stage { background: var(--card); border: 1px solid var(--rule); padding: 0.75rem 1rem; margin: 0 0 1rem; }
+section.stage.current { border-left: 4px solid var(--gold); }
+section.stage h2 small { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.swift-prompt { border-top: 1px solid var(--rule); padding: 0.5rem 0; }
+.swift-prompt form.inline input[type=text], .swift-prompt form.inline input:not([type]) { width: 11rem; }
+.answer.covered { color: #4C7A2A; font-weight: 600; }
+.answer.unknown { color: var(--returned); font-weight: 600; }
+.prelist { display: inline-block; vertical-align: top; width: 15rem; margin: 0 1rem 0.5rem 0; }
+form.inline-button { display: inline; }
+label.check { display: block; font-weight: 400; }

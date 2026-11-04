@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Workshops</h2>
+{% if workshops %}
+<table class="grid">
+  <thead><tr><th>ID</th><th>Systems</th><th>Date</th><th>Facilitator</th><th>Stage</th><th></th></tr></thead>
+  <tbody>
+  {% for ws_id, w in workshops %}
+    <tr>
+      <td><a href="/workshops/{{ ws_id }}">{{ ws_id }}</a></td>
+      <td>{{ w.system_ids|join(", ") }}</td>
+      <td>{{ w.date }}</td>
+      <td>{{ w.facilitator }}</td>
+      <td>{% if w.status == "closed" %}closed{% else %}{{ w.stage }} of 6{% endif %}</td>
+      <td><a href="/workshops/{{ ws_id }}/record">Record</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No workshops yet.</p>
+{% endif %}
+
+<h2>Open a workshop</h2>
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+{% if systems %}
+<form method="post" action="/workshops" class="b1">
+  <fieldset class="b1-row">
+    <h3>Scope and session</h3>
+    <div class="field"><span>Systems in scope</span>
+      {% for s in systems %}<label class="check"><input type="checkbox" name="system_ids" value="{{ s.id }}"> {{ s.id }} {{ s.name }}</label>{% endfor %}
+    </div>
+    <label class="field"><span>Date</span><input type="date" name="date" value="{{ values.get('date', '') }}"></label>
+    <label class="field"><span>Facilitator (the AI officer)</span><input type="text" name="facilitator" value="{{ values.get('facilitator', '') }}"></label>
+    <label class="field"><span>Votes per participant</span><input type="text" name="vote_allowance" inputmode="numeric" value="{{ values.get('vote_allowance', '5') }}"><small>Chapter 6: typically five to ten.</small></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Seats (B.5)</h3>
+    <p class="why-row">Internal audit does not take part. Rotate one or two seats each cycle.</p>
+    {% for seat in seats %}
+    <label class="field"><span>{{ seat.role }}</span><input type="text" name="seat_{{ loop.index }}" value="{{ values.get('seat_%d' % loop.index, '') }}"><small>{{ seat.why }}</small></label>
+    <label class="check"><input type="checkbox" name="seat_{{ loop.index }}_absent"> absent</label>
+    {% endfor %}
+  </fieldset>
+  <p class="actions"><button type="submit">Open the workshop</button></p>
+</form>
+{% else %}
+<p class="empty">Add a system to the <a href="/inventory/new">Inventory</a> first.</p>
+{% endif %}
+{% endblock %}

@@ -86,3 +86,11 @@ def load_indicators() -> list[dict]:
 def load_version() -> str:
     """Return the data-pack version string (SPEC.md section 4 DataPack)."""
     return (DATA_DIR / "VERSION").read_text(encoding="utf-8").strip()
+
+
+def load_swift() -> list[dict]:
+    """Load the 23 SWIFT prompts of B.4 with their register lines (``swift.json``)."""
+    import json
+
+    data = json.loads((DATA_DIR / "swift.json").read_text(encoding="utf-8"))
+    return data["prompts"]
