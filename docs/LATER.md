@@ -73,3 +73,16 @@ One line each (`PLAN.md` rule 11).
   not detected; a person logs the trigger.
 - round 13: incidents, Article 73 reports and complaints have no log of their
   own; an incident is logged as a trigger.
+- round 14: four of the assistant's five draft kinds (SWIFT answers, library
+  lines, trigger summary, board-report narrative) have their schemas and
+  messages in `riskid/ai/prompts.py` but no screen yet; the use-case draft has.
+- round 14: importing a signed data pack needs a signing scheme; Settings
+  lists the packs loaded.
+- round 14: encryption at rest (SQLCipher) is not built; Settings says so.
+- round 14: the single-file build loads Pango from the system to draw PDFs;
+  Windows and macOS builds need it bundled.
+- round 14: of SPEC.md section 9's commands, `init`, `rebuild` and `serve`
+  exist; `check` is a stub, and `export`, `replay`, `backup` and
+  `import-library` are not built (the screens do each).
+- round 14: the board report's item 6 could name the contracts without a
+  notice clause (chapter 12) now that Contracts exist.

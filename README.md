@@ -15,15 +15,16 @@ team sharing a file. Version 1 covers phases 1 to 6 of the method, the
 integration outputs, the cycle and the contract checklist, and deliberately leaves
 out multi-user concurrency, cloud hosting, and any automated scoring.
 
-Status: **in build.** Rounds 0 to 13 of `docs/PLAN.md` are done: the data packs,
-the rules, the store and its audit trail, the Inventory, Library, Use
-cases, Workshop, Reconcile, Assess (with the heat maps), Interact and
-Register (with replay by date) screens, the documents (the register as
-XLSX, CSV and PDF, the FRIA per system, the Statement of Applicability and
-the Principal AI Risk Report), and the Cycle: the indicator sheet, the
-trigger log, the regulatory calendar, the B.8 checklist with sign-off, and
-the quarterly and evidence packs. To try it:
-`pip install -e .`, then `riskid init my.riskid` and `riskid serve my.riskid`.
+Status: **version 1 built, in review.** Rounds 0 to 14 of `docs/PLAN.md` are
+done: the data packs, the rules, the store and its audit trail; the Inventory,
+Library, Workshop, Use cases, Reconcile, Assess, Interact, Register, Documents,
+Cycle, Contracts and Settings screens; the optional AI assistant (off by
+default); and the acceptance test of SPEC.md section 11, which goes from
+chapter 5 to a signed quarterly pack on the fixture organisation. To try it:
+`pipx install git+https://github.com/RoryPeterRoberts/riskid-workbench`, then
+`riskid init my.riskid` and `riskid serve my.riskid`. `docs/USER_GUIDE.md` has a
+page per screen.
+
 Read `docs/SPEC.md` (what it is), `docs/PLAN.md` (how it is built, round by
 round) and `docs/RiskID_Workbench_Brochure.pdf` (for the Risk Manager).
 

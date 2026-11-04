@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="stage">
+  <h2>Supplier contracts</h2>
+  <p class="record">{{ meeting }} of {{ supplied }} supplied systems have a contract that meets the clause standard: recorded against B.9, with no gap against the system's live lines.</p>
+  <table class="grid">
+    <thead><tr><th>System</th><th>Supplier</th><th>Contract</th><th>Gaps against live lines</th></tr></thead>
+    <tbody>{% for system, contract, n_gaps, needed, meets in rows %}
+    <tr><td><a href="/contracts/{{ system.id }}">{{ system.id }}</a> {{ system.name }}</td>
+      <td>{{ system.supplier or "" }}{% if system.model_provider %}<br><small>model: {{ system.model_provider }}</small>{% endif %}</td>
+      <td>{% if contract %}{{ contract.reference or "recorded" }}{% elif needed %}not yet reviewed{% else %}<small>built in-house; no supplier recorded</small>{% endif %}</td>
+      <td>{% if needed %}{% if meets %}none{% elif not n_gaps %}<small>no live lines yet</small>{% else %}{{ n_gaps }}{% endif %}{% endif %}</td></tr>{% else %}
+    <tr><td colspan="4" class="empty">No systems in the inventory.</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+{% endblock %}

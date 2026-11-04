@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<nav class="tabs"><a href="#organisation">Organisation</a><a href="#people">People</a><a href="#assistant">Assistant</a><a href="#packs">Data packs</a><a href="#file">File</a></nav>
+
+<section class="stage" id="organisation">
+  <h2>Organisation</h2>
+  <form method="post" action="/settings/organisation" class="stacked">
+    <label>Name <input name="name" value="{{ organisation.name or "" }}"></label>
+    <label>Sector <input name="sector" value="{{ organisation.sector or "" }}"></label>
+    <label>Jurisdictions <input name="jurisdictions" value="{{ (organisation.jurisdictions or [])|join(", ") }}" placeholder="IE, EU"></label>
+    <label>Risk criteria (the acceptable-risk statement, chapter 5) <textarea name="risk_criteria" rows="3">{{ organisation.risk_criteria or "" }}</textarea></label>
+    <label>Accountable executive <input name="accountable_executive" value="{{ organisation.accountable_executive or "" }}"></label>
+    <label>AI officer <input name="ai_officer" value="{{ organisation.ai_officer or "" }}"></label>
+    <label>Facilitator <input name="facilitator" value="{{ organisation.facilitator or "" }}"></label>
+    <button type="submit">Record</button>
+  </form>
+</section>
+
+<section class="stage" id="people">
+  <h2>People</h2>
+  <p class="record">Recording as {{ actor }}. Every change is recorded in the name of the person recording.</p>
+  {% if people %}<table class="grid"><thead><tr><th>ID</th><th>Name</th><th>Role</th></tr></thead>
+    <tbody>{% for k, p in people %}<tr><td>{{ k }}</td><td>{{ p.name }}</td><td>{{ p.role or "" }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <form method="post" action="/settings/actor" class="inline">
+    <label>Record as <select name="name"><option value="{{ default_actor }}">{{ default_actor }} (this account)</option>{% for k, p in people %}<option value="{{ p.name }}"{% if p.name == actor %} selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></label>
+    <button type="submit">Choose</button>
+  </form>
+  <form method="post" action="/settings/people" class="inline">
+    <label>Name <input name="name"></label>
+    <label>Role <input name="role" placeholder="AI officer"></label>
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<section class="stage" id="assistant">
+  <h2>AI assistant</h2>
+  <p class="record">{% if assistant_on %}The assistant is on: {{ assistant.model }} at {{ assistant.endpoint }}.{% else %}The assistant is off.{% endif %}
+  It drafts; a person accepts. It sends only the fields on the screen it drafts for, and never sets a score, a rating, an acceptance or an owner (chapter 14). Put it in your inventory like any other AI system.</p>
+  <form method="post" action="/settings/assistant" class="stacked">
+    <label>Endpoint (the server's base address) <input name="endpoint" value="{{ assistant.endpoint or "" }}" placeholder="http://127.0.0.1:8085/v1"></label>
+    <label>Model <input name="model" value="{{ assistant.model or "" }}"></label>
+    <label>Version recorded with each draft <input name="version" value="{{ assistant.version or "" }}"></label>
+    <label>Environment variable holding the API key, if one is needed <input name="key_env" value="{{ assistant.key_env or default_key_env }}"></label>
+    <label><span><input type="checkbox" name="local"{% if assistant.local or not assistant %} checked{% endif %}> A local server (vLLM or Ollama): reasoning effort medium, with a second request without thinking if the first runs out</span></label>
+    <label><span><input type="checkbox" name="enabled"{% if assistant.enabled %} checked{% endif %}> Switched on</span></label>
+    <button type="submit">Record</button>
+  </form>
+</section>
+
+<section class="stage" id="packs">
+  <h2>Data packs</h2>
+  <table class="grid"><thead><tr><th>Pack</th><th>Version</th><th>Loaded</th><th>Source</th></tr></thead>
+    <tbody>{% for p in packs %}<tr><td>{{ p.name }}</td><td>{{ p.version }}</td><td>{{ p.date }}</td><td>{{ p.source }}</td></tr>{% else %}<tr><td colspan="4" class="empty">No data packs loaded.</td></tr>{% endfor %}</tbody></table>
+  <p><small>Every document records these versions. Importing a signed pack comes later.</small></p>
+</section>
+
+<section class="stage" id="file">
+  <h2>This file</h2>
+  <p class="record">This file is not encrypted at rest: SQLCipher is not available in this installation. Keep it on an encrypted disk.</p>
+  <p><a href="/settings/backup.riskid">Download a backup</a> <small>(a plain copy of the file, recorded as a document)</small></p>
+  <p>Export: <a href="/documents">the documents</a>, <a href="/cycle/evidence-pack.zip">the evidence pack</a>.</p>
+</section>
+{% endblock %}

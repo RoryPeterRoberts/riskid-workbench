@@ -2,7 +2,8 @@
 
 Quarterly pack: the register (XLSX, CSV), the change list since the previous
 signed run, the disagreement log and the run's checklist with its evidence
-and sign-off. Evidence pack: the register, the heat maps, the FRIA of each
+and sign-off (HTML and PDF), so it opens in Excel, a PDF reader and a browser
+(SPEC.md section 11). Evidence pack: the register, the heat maps, the FRIA of each
 high-risk system, the Statement of Applicability, the board report, the
 checklist of every signed run, the disagreement log and the whole audit
 trail. Each is one ZIP, and carries the data-pack versions and the state hash
@@ -57,7 +58,9 @@ def quarterly(state: dict, library: dict, events: list, run_id: str, run: dict, 
         pack.writestr("register.csv", register.to_csv(table, prov))
         pack.writestr("change_list.csv", change_list(events))
         pack.writestr("disagreement_log.csv", disagreement_log(state))
-        pack.writestr("checklist.html", render.html("checklist.html", run_id=run_id, run=run, steps=steps, prov=prov))
+        checklist = render.html("checklist.html", run_id=run_id, run=run, steps=steps, prov=prov)
+        pack.writestr("checklist.html", checklist)
+        pack.writestr("checklist.pdf", render.pdf(checklist))
     return out.getvalue()
 
 

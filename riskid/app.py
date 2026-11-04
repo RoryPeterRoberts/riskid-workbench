@@ -29,6 +29,7 @@ def create_app(store_path=None, actor: str | None = None, allowed_hosts=None) ->
     application = FastAPI(title=TITLE)
     application.state.store_path = Path(store_path) if store_path is not None else None
     application.state.actor = actor or default_actor()
+    application.state.default_actor = application.state.actor    # Settings can switch to a listed person
 
     @application.get("/")
     def index():

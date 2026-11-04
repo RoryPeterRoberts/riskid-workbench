@@ -154,8 +154,34 @@ MODULES = {
               "within about a day; after a Cruise robotaxi dragged a pedestrian in October 2023, California "
               "suspended its permits, and the business was wound down in December 2024."),
     ),
+    "contracts": Module(
+        key="contracts",
+        title="Contracts",
+        path="/contracts",
+        chapter=12,
+        chapter_title="Integration: Impact Assessments, the Statement of Applicability, Monitoring and the Board",
+        template="B.9 AI Contract Clause Checklist",
+        why=("The procurement checklist is the control column of these two lines (LEG-12 and TRA-04), run "
+             "before signature."),
+        case=("The silent vendor update: a vendor that changes the model behind an API leaves the world and the "
+              "organisation unchanged; MOD-05 has its home in the taxonomy, and the contract with the vendor "
+              "carries the control (A.10.3)."),
+    ),
+    "settings": Module(
+        key="settings",
+        title="Settings",
+        path="/settings",
+        chapter=14,
+        chapter_title="Technology: Monitoring, Evaluation Harnesses, Red Teams and Using AI to Find AI Risk",
+        template="The six rules for an AI assistant (chapter 14)",
+        why=("Text drafted or summarised by a model that nobody has checked is Very Low evidence in the data "
+             "quality rating."),
+        case=("The Test That Ran for Years: in June 2024 McDonald's ended its test with IBM of an AI system "
+              "that took drive-through orders by voice, after order errors had been widely reported "
+              "(MOD-07, MOD-09)."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
 NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact",
-                                 "register", "documents", "cycle"))
+                                 "register", "documents", "cycle", "contracts", "settings"))

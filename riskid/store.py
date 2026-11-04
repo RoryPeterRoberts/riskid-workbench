@@ -61,6 +61,7 @@ _ENTITY_NAMES = (
     "usecase", "workshop", "interaction", "bowtie", "trigger", "cycle",
     "contract", "document", "library", "taxonomy", "pack",
     "discovery", "disagreement", "resolution", "reconciliation",  # rounds 4 and 8
+    "person", "settings", "ai_request",                          # round 14
 )
 
 

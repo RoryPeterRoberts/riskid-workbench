@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "riskid-workbench"
-version = "0.1.0"
+version = "1.0.0"
 description = "The AI risk identification method as software."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,7 +27,7 @@ dependencies = [
 riskid = "riskid.cli:main"
 
 [tool.setuptools]
-packages = ["riskid", "riskid.web", "riskid.documents"]
+packages = ["riskid", "riskid.web", "riskid.documents", "riskid.ai"]
 
 # The data packs ship as data files inside the package (SPEC.md section 9);
 # declare them so a non-editable install (pipx) keeps the importers working.
