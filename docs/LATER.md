@@ -37,3 +37,10 @@ One line each (`PLAN.md` rule 11).
 - round 7: emerging risks stay in each workshop's taxonomy gap list; the
   organisation-wide gap list for chapter 4's taxonomy maintenance has no
   entity yet.
+- round 8: chapter 8's enterprise AI risk map (systems against shared
+  vendors, models, data and overseers) is not built.
+- round 8: chapter 8's ownership rules (natural owner, largest exposure, the
+  designated senior manager) are not applied when a gap is resolved; the
+  owner is set elsewhere.
+- round 8: an escalated line has no "principal" flag on the register line;
+  the resolution records the escalation.

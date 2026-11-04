@@ -243,6 +243,41 @@ class Workshop(Model):
     vote_allowance: int = 5            # votes per participant (chapter 6: five to ten)
 
 
+# --- Reconciliation (chapter 8; round 8) -----------------------------------
+
+@dataclass
+class Disagreement(Model):
+    """An entry in the disagreement log: a minority view kept, not averaged away."""
+    line_id: str = None
+    raised_in: str = None              # the workshop, the reconciliation or the assessment
+    holder: str = None                 # the person or seat holding the minority view
+    majority_score: int = None
+    minority_score: int = None         # 1-5
+    dimension: str = None              # FIN | REG | REP | IND | OPS | likelihood | control effectiveness
+    evidence: str = None
+    status: str = "open"               # open | resolved
+
+
+@dataclass
+class Resolution(Model):
+    """One of chapter 8's five dispositions for a gap or a disagreement."""
+    subject: str = None                # a line ID or a disagreement ID
+    disposition: str = None            # add | merge | escalate | local | not applicable
+    reason: str = None
+    target: str = None                 # the line merged into
+    decided_by: str = None
+    date: str = None
+
+
+@dataclass
+class Reconciliation(Model):
+    """A signed pass of the five steps (chapter 8, step 5)."""
+    date: str = None
+    present: list = dfield(default_factory=list)
+    signed_by: str = None
+    counts: dict = dfield(default_factory=dict)
+
+
 # --- Interaction / Bow-tie --------------------------------------------------
 
 @dataclass

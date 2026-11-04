@@ -75,7 +75,20 @@ MODULES = {
               "Offers, whose algorithm set the prices it paid for homes; the model had not "
               "kept pace with the market (MOD-06, SOC-06)."),
     ),
+    "reconcile": Module(
+        key="reconcile",
+        title="Reconcile",
+        path="/reconcile",
+        chapter=8,
+        chapter_title="Reconciliation and the Enterprise AI Portfolio View",
+        template="The five steps of reconciliation and the disagreement log",
+        why=("If a regulator or auditor asks how the register came to hold what it holds, "
+             "the record is the answer."),
+        case=("The Fraud That Nobody Owned: in early 2024 an Arup employee in Hong Kong "
+              "transferred about US$25 million after a video call with deepfakes of colleagues; "
+              "each function's answer on who owned the risk stopped at its own edge (SOC-02)."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile"))

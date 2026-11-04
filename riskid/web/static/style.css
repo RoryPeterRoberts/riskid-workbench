@@ -136,3 +136,7 @@ section.stage h2 small { font-weight: 400; color: var(--muted); font-size: 0.85r
 .prelist { display: inline-block; vertical-align: top; width: 15rem; margin: 0 1rem 0.5rem 0; }
 form.inline-button { display: inline; }
 label.check { display: block; font-weight: 400; }
+
+/* Reconcile (round 8) */
+nav.tabs { display: flex; gap: 0.25rem; margin: 0 0 1rem; }
+nav.tabs a { background: var(--card); border: 1px solid var(--rule); border-bottom: 3px solid var(--gold); padding: 0.35rem 0.9rem; text-decoration: none; font-weight: 600; }
