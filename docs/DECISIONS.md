@@ -148,6 +148,8 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   and the business owner did not, or the reverse, the record lists it for the
   disagreement log. 2026-11-04.
 - round 7: closing the workshop makes each voted library line not yet in the
-  register a candidate line with source top-down, for the workshop's first
-  system; a line already in the register is left as it is; emerging risks go
-  to the taxonomy gap list. 2026-11-04.
+  register a candidate line with source top-down, for the first system in
+  scope that the line was proposed for (else the first system); a line
+  already in the register is left as it is; emerging risks stay in the
+  workshop's taxonomy gap list. Attendance is set when the workshop opens and
+  taken at stage 1; absent seats do not write lists or vote. 2026-11-04.

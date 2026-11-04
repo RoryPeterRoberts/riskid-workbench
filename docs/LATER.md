@@ -31,5 +31,9 @@ One line each (`PLAN.md` rule 11).
   section 2) are not built; the emerging risks are listed for them.
 - round 7: B.5's quarterly session keeps stages 1, 2, 3 (change prompts
   only), 5 and 6; the workshop does not yet distinguish a quarterly session.
-- round 7: a workshop on several systems puts its top-down lines on the
-  first system, because a register line has one `system_id`.
+- round 7: a workshop on several systems puts each top-down line on one
+  system (the first it was proposed for), because a register line has one
+  `system_id`.
+- round 7: emerging risks stay in each workshop's taxonomy gap list; the
+  organisation-wide gap list for chapter 4's taxonomy maintenance has no
+  entity yet.
