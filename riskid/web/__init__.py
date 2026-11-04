@@ -82,8 +82,10 @@ class SameOriginWrites:
 def install(app, allowed_hosts) -> None:
     """Add the guards, the static files and the module routers to ``app``."""
     from riskid.web.routes_inventory import router as inventory
+    from riskid.web.routes_library import router as library
 
     app.add_middleware(SameOriginWrites)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(allowed_hosts))
     app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
     app.include_router(inventory)
+    app.include_router(library)

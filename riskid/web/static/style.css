@@ -105,3 +105,14 @@ form.b1 .why-row { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.9rem; }
 form.inline { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; }
 form.inline label { display: flex; flex-direction: column; font-size: 0.9rem; }
 form.inline input { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid #B9B3A0; border-radius: 3px; }
+
+/* Library (round 5) */
+.picker { background: var(--card); border: 1px solid var(--rule); padding: 0.75rem 1rem; margin-bottom: 1rem; }
+.strawman { margin: 0 0 1rem; padding: 0.75rem 1rem; background: var(--card); border-left: 4px solid var(--navy); font-style: italic; }
+.why-list { margin: 0; padding-left: 1.1rem; font-size: 0.9rem; }
+details.removed { margin-top: 1rem; }
+details.removed summary { cursor: pointer; font-weight: 600; }
+button.secondary { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
+dl.record { display: grid; grid-template-columns: 12rem 1fr; gap: 0.4rem 1rem; background: var(--card); padding: 1rem; }
+dl.record dt { font-weight: 600; }
+dl.record dd { margin: 0; }

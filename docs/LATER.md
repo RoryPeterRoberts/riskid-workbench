@@ -12,3 +12,12 @@ One line each (`PLAN.md` rule 11).
   body; a page in the shell would read better.
 - round 4: `load_packs` commits once per event (136 commits on `riskid
   init`); one transaction would make init and the tests faster.
+- round 5: chapter 5 says one risk can sit across many systems, but a
+  register line has one `system_id` (SPEC.md section 4), so a second system
+  cannot adopt a line already in the register.
+- round 5: chapter 5 asks for a recorded reason for every library line not
+  kept; the proposal page shows the filter's reasons but has no "declined
+  with reason" record for the person's own decisions.
+- round 5: three lines cite an Annex III point (FAI-01, FAI-02, FAI-03); the
+  inventory records the Article 6 outcome but not the Annex III point, so
+  those citations are not matched.

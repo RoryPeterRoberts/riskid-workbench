@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block heading %}{{ line.id }}: {{ line.title }}{% endblock %}
+{% block content %}
+<p class="actions"><a href="/library">All lines</a>{% if in_register %} · <strong>In the register</strong> for {{ in_register.system_id }} ({{ in_register.status }}){% endif %}</p>
+<dl class="record">
+  <dt>Category</dt><dd>{{ l1_names.get(line.l1, line.l1) }}, {{ line.l2 }}</dd>
+  <dt>Description</dt><dd>{{ line.description }}</dd>
+  <dt>Event</dt><dd>{{ line.event }}</dd>
+  <dt>Lifecycle</dt><dd>{{ line.lifecycle }}</dd>
+  <dt>Role</dt><dd>{{ line.role }}</dd>
+  <dt>Who is harmed</dt><dd>{{ line.harmed }}</dd>
+  <dt>Exposure</dt><dd>{{ line.exposure }}</dd>
+  <dt>Library scores</dt><dd>L {{ line.L }} · I {{ line.I }} ({{ line.dim }}) · V {{ line.V }} · S {{ line.S }} · data quality {{ line.dq }} · residual L {{ line.rL }}, I {{ line.rI }}<br><small>The book's judgement for a generic organisation, to show how the scales work; not a verdict on your system (chapter 5).</small></dd>
+  <dt>Controls</dt><dd>{{ line.controls }}</dd>
+  <dt>Owner (role)</dt><dd>{{ line.owner }}</dd>
+  <dt>Key risk indicators</dt><dd>{{ line.kri }}</dd>
+  <dt>Law</dt><dd>{{ line.reg }}</dd>
+  <dt>Sources</dt><dd>{{ line.sources }}</dd>
+</dl>
+{% endblock %}

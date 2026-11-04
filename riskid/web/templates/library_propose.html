@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block heading %}{% if system %}Proposed lines for {{ system.id }} {{ system.name }}{% else %}Propose lines for a system{% endif %}{% endblock %}
+{% block content %}
+{% if refusal %}<div class="returned" role="alert"><ul class="reasons"><li>{{ refusal }}</li></ul></div>{% endif %}
+{% if adopted and system %}<p class="notice">Adopted {{ adopted }} for {{ system.id }} as a candidate line. Nothing is scored yet.</p>{% endif %}
+
+{% if not system %}
+  {% if systems %}
+  <form method="get" action="/library/propose" class="inline picker">
+    <label>System
+      <select name="system">{% for s in systems %}<option value="{{ s.id }}">{{ s.id }} {{ s.name }}</option>{% endfor %}</select>
+    </label>
+    <button type="submit">Propose</button>
+  </form>
+  {% else %}
+  <p class="empty">No systems yet. <a href="/inventory/new">Add the first system to the Inventory</a>; proposals follow its role, stage, classification and data.</p>
+  {% endif %}
+{% else %}
+<blockquote class="strawman">
+  "For any one system, the register is the straw man. You do not score it. You cut it down and then add to it." Record the reason for every line you remove (chapter 5).
+</blockquote>
+<p>{{ system.role_under_act or "role not recorded" }} · {{ system.article_6_outcome or "classification not recorded" }} · {{ system.lifecycle_stage or "stage not recorded" }}{% if system.vendor_or_built %} · {{ system.vendor_or_built }}{% endif %} · <a href="/inventory/{{ system.id }}">edit the inventory entry</a></p>
+
+<h2>Proposed ({{ proposed|length }})</h2>
+<table class="grid">
+  <thead><tr><th>ID</th><th>Risk</th><th>Why it is proposed</th><th></th></tr></thead>
+  <tbody>
+  {% for line, reasons in proposed %}
+    <tr>
+      <td><a href="/library/{{ line.id }}">{{ line.id }}</a></td>
+      <td>{{ line.title }}<br><small>{{ l1_names.get(line.l1, line.l1) }}</small></td>
+      <td><ul class="why-list">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></td>
+      <td>{% set held = register.get(line.id) %}
+        {% if held %}<span class="flag">In the register</span><br><small>{{ held.system_id }}, {{ held.status }}</small>
+        {% else %}<form method="post" action="/library/adopt"><input type="hidden" name="line_id" value="{{ line.id }}"><input type="hidden" name="system_id" value="{{ system.id }}"><button type="submit">Adopt</button></form>{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<details class="removed">
+  <summary>Removed by the filter ({{ removed|length }}), each with its reason</summary>
+  <table class="grid">
+    <thead><tr><th>ID</th><th>Risk</th><th>Why it is removed</th><th></th></tr></thead>
+    <tbody>
+    {% for line, reasons in removed %}
+      <tr>
+        <td><a href="/library/{{ line.id }}">{{ line.id }}</a></td>
+        <td>{{ line.title }}</td>
+        <td><ul class="why-list">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></td>
+        <td>{% set held = register.get(line.id) %}
+          {% if held %}<span class="flag">In the register</span><br><small>{{ held.system_id }}, {{ held.status }}</small>
+          {% else %}<form method="post" action="/library/adopt"><input type="hidden" name="line_id" value="{{ line.id }}"><input type="hidden" name="system_id" value="{{ system.id }}"><button type="submit" class="secondary">Adopt anyway</button></form>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+{% endif %}
+{% endblock %}
