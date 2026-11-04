@@ -299,3 +299,7 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   and red indicators and the triggers since the last report, the OPS-05
   indicator, the dates ahead on the calendar and the LEG-09 indicator, and
   lines past their review date with the last signed run. 2026-11-04.
+- round 13: step 8 lists every trigger still without a significance decision,
+  whenever it was logged, not only those since the last run: B.8 asks that
+  every trigger since last quarter was processed, and one from an earlier
+  quarter that is still undecided was not processed either. 2026-11-04.
