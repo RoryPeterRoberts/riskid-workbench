@@ -175,3 +175,26 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   score (1 to 5), the majority score if known, the dimension (an impact
   dimension, likelihood or control effectiveness) and the evidence. The
   workshops' seat differences are shown as the challenge agenda. 2026-11-04.
+- round 9: rule change, with tests: a control test whose result is recorded
+  as failed does not unlock the residual. SPEC.md 5.4 says "a test date and a
+  result"; chapter 9 says "until it passes a test the residual stays at the
+  inherent score", and the method is the book. The test form asks for passed
+  or failed. The golden file is unchanged (91/91). 2026-11-04.
+- round 9: SPEC.md 5.4's second half is now a rule:
+  `rules.residual_basis_cites_test` (a lower residual's data-quality basis
+  names a passed control test or gives its date). 2026-11-04.
+- round 9: `riskid/data/flags.json` holds the library's rule flags
+  (`material_on_impact_alone`: LEG-08, from SPEC.md 5.3), because the register
+  file has no column for them; a system classified as a prohibited practice
+  makes its lines material. 2026-11-04.
+- round 9: each save is a new assessment (AS-nnn) for the line; the latest is
+  the current one, and the line's history keeps them all. The data-quality
+  basis is required for every rating (B.6 field 4: "with the evidence"). A
+  residual above the inherent is refused. A minority view in the record also
+  goes to the disagreement log. 2026-11-04.
+- round 9: a vulnerability or speed of onset of 5 is shown as "in front of
+  the owner this week" (chapter 9), whatever the score. 2026-11-04.
+- round 9: the heat maps are drawn by `riskid/documents/heatmap.py` with the
+  reference script's drawing (band colours, IDs three to a row, the score in
+  the corner), and are also given as a text table for screen readers.
+  2026-11-04.

@@ -1,0 +1,4 @@
+{
+  "source": "SPEC.md 5.3 and chapter 9: a line flagged material_on_impact_alone in the library is material whatever the likelihood",
+  "material_on_impact_alone": ["LEG-08"]
+}
