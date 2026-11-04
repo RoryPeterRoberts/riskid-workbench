@@ -104,3 +104,25 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
 - round 5: a line the filter removed can still be adopted ("Adopt anyway");
   the event's reason then records the filter's reason it overrode.
   2026-11-04.
+- round 6: `Store.transaction()` keeps several events together: all are
+  committed or none. The pack load uses it, so `riskid init` is atomic (and a
+  failed init removes the empty file it created), as do an inventory edit's
+  field events and a use case's acceptance with its register line.
+  2026-11-04.
+- round 6: `UseCase` gains `source` (the general template or one of the ten
+  specialist sub-processes; chapter 7: every risk carries its source) and
+  `line_id` (the register line it created or supports). 2026-11-04.
+- round 6: a use case is returned for the three checks of SPEC.md 5.5
+  (`rules.check_use_case`) and for an incomplete template: no Level 2
+  taxonomy code, no definition, no named owner, no data quality rating, a
+  control row with no name, an unknown type or an unreadable test date, an
+  unknown risk ID, or a taxonomy code that differs from the line named in
+  field 1. Chapter 7: a submission that classifies in its own categories is
+  sent back. 2026-11-04.
+- round 6: every submission is recorded. A returned one keeps its reasons
+  (one per line) and is corrected and resubmitted on the same UC-nnn record;
+  an accepted one is not resubmitted (409). 2026-11-04.
+- round 6: an accepted use case becomes a candidate line with source
+  bottom-up: a new ORG-nnn, or the library ID named in field 1. A risk already
+  in the register is supported by the use case (`line_id`) and not entered
+  twice. 2026-11-04.

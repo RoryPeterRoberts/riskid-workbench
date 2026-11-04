@@ -21,3 +21,7 @@ One line each (`PLAN.md` rule 11).
 - round 5: three lines cite an Annex III point (FAI-01, FAI-02, FAI-03); the
   inventory records the Article 6 outcome but not the Annex III point, so
   those citations are not matched.
+- round 6: the controls listed in an accepted use case (B.2 field 8) could
+  seed the controls table of the Assess round.
+- round 6: the use-case form has four control rows; an HTMX "add a row"
+  would allow more.

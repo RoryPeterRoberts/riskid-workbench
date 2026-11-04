@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block heading %}Use case {{ uc_id }}: accepted{% endblock %}
+{% block content %}
+<p class="notice">Accepted on {{ usecase.date }} from {{ usecase.submitted_by }}{% if line %}: candidate line <strong>{{ line.id }}</strong> ({{ line.source }}, {{ line.status }}){% endif %}. Source: {{ usecase.source }}.</p>
+<dl class="record">
+  <dt>System</dt><dd><a href="/inventory/{{ system.id }}">{{ system.id }}</a> {{ system.name }}</dd>
+  {% for name, label, record, note in headers %}<dt>{{ label }}</dt><dd>{{ usecase.headers.get(name) or "" }}</dd>{% endfor %}
+  {% for number, name, label, what, example in fields %}
+  <dt>{{ number }}. {{ label }}</dt>
+  <dd>
+    {% if name == "controls" %}
+      {% for c in usecase.fields_.controls %}<div>{{ c.name }}{% if c.type %} ({{ c.type }}){% endif %}{% if c.test_date %}, tested {{ c.test_date }}{% endif %}{% if c.evidence %}: {{ c.evidence }}{% endif %}</div>{% else %}<span class="empty">None listed</span>{% endfor %}
+    {% elif name == "data_quality" %}
+      {{ usecase.fields_.data_quality }}{% if usecase.fields_.data_quality_basis %}: {{ usecase.fields_.data_quality_basis }}{% endif %}
+    {% else %}
+      {{ usecase.fields_.get(name) or "" }}
+    {% endif %}
+  </dd>
+  {% endfor %}
+</dl>
+<p class="actions"><a href="/usecases">All use cases</a></p>
+{% endblock %}
