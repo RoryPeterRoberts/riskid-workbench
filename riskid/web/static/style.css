@@ -162,3 +162,7 @@ table.matrix td strong { color: var(--navy); }
 .bowtie > * { min-width: 0; }
 .bowtie table.grid { table-layout: fixed; width: 100%; margin: 0; }
 .bowtie table.grid td, .bowtie table.grid td:first-child { white-space: normal; overflow-wrap: anywhere; }
+
+/* Register (round 11) */
+table.register td, table.register th { font-size: 0.85rem; min-width: 6rem; }
+table.register td:nth-child(3) { min-width: 16rem; }

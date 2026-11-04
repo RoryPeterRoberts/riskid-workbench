@@ -115,7 +115,20 @@ MODULES = {
               "about $440 million in 45 minutes; one Cruise robotaxi accident in October 2023 "
               "ended in the wind-down of the business in December 2024."),
     ),
+    "register": Module(
+        key="register",
+        title="Register",
+        path="/register",
+        chapter=11,
+        chapter_title="Documentation: The Living AI Risk Inventory",
+        template="B.3 The Fourteen-Field Inventory and the Five AI Context Columns",
+        why=("An organisation that has the record can say what it knew about a system's risks, "
+             "when it knew it, and what it did about each one."),
+        case=("The Post Office and Horizon: between 1999 and 2015 the Post Office prosecuted more "
+              "than 900 sub-postmasters on evidence from faulty software, and they had no practical "
+              "way to examine the system's own records."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact", "register"))

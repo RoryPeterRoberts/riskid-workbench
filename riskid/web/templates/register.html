@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="get" action="/register" class="inline picker">
+  <label>Show the register as it stood on <input type="date" name="as_of" value="{{ as_of or '' }}" max="{{ today }}"></label>
+  <button type="submit">Replay</button>{% if as_of %} <a href="/register">Back to today</a>{% endif %}
+</form>
+{% if as_of %}<p class="notice">The register as it stood on {{ as_of }}, at the end of that day (UTC), rebuilt from the audit trail. Read only.</p>{% endif %}
+
+<div class="scroll"><table class="grid register" id="grid">
+  <thead><tr>
+    <th>1 Risk ID</th><th>2 Taxonomy</th><th>3 Risk definition</th><th>4 COSO</th><th>5 Risk owner</th>
+    <th>6 Inherent</th><th>7 Controls</th><th>8 Residual</th><th>9 Material</th><th>10 Data quality</th>
+    <th>11 Interactions</th><th>12 Indicators</th><th>13 Trend</th><th>14 Review</th>
+    <th>15 Lifecycle</th><th>16 Role</th><th>17 Persons affected</th><th>18 Regulatory hooks</th><th>19 Annex A</th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}{% set l = r.line %}{% set a = r.a %}
+    <tr>
+      <td><a href="/register/{{ r.id }}">{{ r.id }}</a><br><small>{{ l.status }}, {{ l.source }}, {{ l.system_id }}</small></td>
+      <td>{{ r.taxonomy }}</td>
+      <td>{{ l.definition or "" }}</td>
+      <td>{{ l.coso_category or "" }}</td>
+      <td>{{ l.owner or "" }}</td>
+      {% if a %}<td>{{ a.inherent }}<br><small>{{ a.inherent_band }}, {{ a.dominant_dimension }}; V{{ a.vulnerability }} S{{ a.speed }}</small></td>{% else %}<td class="empty">not assessed</td>{% endif %}
+      <td><small>{{ r.controls|join("; ") }}</small></td>
+      {% if a %}<td>{{ a.residual }}<br><small>{{ r.residual_band or "" }}</small></td><td>{{ "Y" if a.material else "N" }}<br><small>{{ a.material_rule }}</small></td><td>{{ a.data_quality }}</td>{% else %}<td></td><td></td><td></td>{% endif %}
+      <td><small>{{ r.interactions }}</small></td>
+      <td><small>{{ r.indicators }}</small></td>
+      <td>{{ r.trend }}</td>
+      <td><small>{% if r.last_review %}last {{ r.last_review }}{% endif %}</small></td>
+      <td><small>{{ l.lifecycle_stages|join("; ") }}</small></td>
+      <td>{{ l.role or "" }}</td>
+      <td><small>{{ l.persons_affected|join("; ") }}</small></td>
+      <td><small>{{ l.regulatory_hooks|join("; ") }}</small></td>
+      <td><small>{{ l.annex_a_controls|join(", ") }}</small></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="19" class="empty">No live lines{% if as_of %} on that date{% endif %}.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+
+<section class="stage" id="retired">
+  <h2>Retired lines</h2>
+  <p class="record">A line is retired with a recorded reason and keeps its ID. An inventory that shrinks without recorded retirements has lost track of its risks.</p>
+  {% for line_id, l in retired %}<p><a href="/register/{{ line_id }}">{{ line_id }}</a>: {{ l.retired_reason }}</p>{% else %}<p class="empty">None.</p>{% endfor %}
+</section>
+
+<section class="stage" id="signs">
+  <h2>A living inventory or a compliance artefact?</h2>
+  <p class="record">Chapter 11's signs you can check: definitions in different words, scores that move between quarters, data quality spread across the scale, interaction summaries filled in, staggered review dates, a disagreement log with entries.</p>
+  <dl class="record">{% for sign, value in signs %}<dt>{{ sign }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
+</section>
+{% endblock %}

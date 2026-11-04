@@ -55,8 +55,7 @@ CREATE TABLE IF NOT EXISTS projection (
 CREATE INDEX IF NOT EXISTS events_ts ON events (ts, seq);
 """
 
-# Entity names used as event.entity values. One projection table covers every
-# entity, so the set of names only ever grows.
+# Entity names (event.entity); one projection table covers them all, so the set only grows.
 _ENTITY_NAMES = (
     "organisation", "system", "register", "assessment", "control", "indicator",
     "usecase", "workshop", "interaction", "bowtie", "trigger", "cycle",
@@ -195,6 +194,10 @@ class Store:
 
     def organisation(self) -> dict | None:
         return self._projections().get("organisation", {}).get("organisation")
+
+    def events(self) -> list:
+        """Every event in the audit trail, in order, as dicts (the trail itself, read-only)."""
+        return [dict(r) for r in self._conn.execute("SELECT * FROM events ORDER BY seq")]
 
     # -- time travel: the audit trail replayed ----------------------------
 
@@ -377,8 +380,7 @@ def init(path: str | Path, when=None) -> Store:
     try:
         store.load_packs(when=when)
     except BaseException:
-        # The file was created by this call and holds no events: remove it so
-        # a second `riskid init` is not refused by an empty file.
+        # Created by this call and holding no events: removed, so a second init is not refused.
         store.close()
         target.unlink()
         raise
