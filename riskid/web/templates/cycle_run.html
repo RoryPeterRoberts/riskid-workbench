@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p><a href="/cycle#runs">All runs</a></p>
+<h2>{{ run_id }}: {{ run.kind }} run of {{ run.date }}</h2>
+<p class="record">{% if run.signed_date %}Signed by {{ run.signed_by }} on {{ run.signed_date }}; the next run is due {{ run.next_due }}. The run is closed.{% else %}Open. Record the evidence and the owner of each step; the run is signed when all eighteen have evidence and are done.{% endif %}
+{% if since %} It covers the period since the previous run was signed, {{ since }}.{% endif %}</p>
+<p><a href="/cycle/runs/{{ run_id }}/pack.zip">Download the {{ run.kind }} pack</a> <small>(the register{% if run.signed_date %} as signed{% endif %}, the change list, the disagreement log and this checklist; recorded as a document)</small></p>
+
+{% for s in steps %}{% set r = recorded.get(s.n|string) or {} %}
+<section class="stage step" id="step-{{ s.n }}">
+  <h3>{{ s.n }}. {{ s.step }} <small>{{ s.group }}</small></h3>
+  <p><small>Evidence (B.8): {{ s.evidence }}. Owner (B.8): {{ s.owner }}.</small></p>
+  {% if findings.get(s.n) %}<ul class="why-list">{% for f in findings[s.n] %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+  {% if r %}<p>{% if r.done %}<span class="flag">done</span> {% endif %}{{ r.evidence or "No evidence recorded." }} <small>({{ r.owner or s.owner }}, {{ r.date }})</small></p>{% endif %}
+  {% if not run.signed_date %}
+  <form method="post" action="/cycle/runs/{{ run_id }}/steps/{{ s.n }}" class="inline">
+    <label>Evidence <input name="evidence" size="40" value="{{ r.evidence or "" }}"></label>
+    <label>Owner <input name="owner" value="{{ r.owner or s.owner }}"></label>
+    <label>Date <input name="date" type="date" value="{{ r.date or "" }}"></label>
+    <label><input type="checkbox" name="done"{% if r.done %} checked{% endif %}> Done</label>
+    <button type="submit">Record</button>
+  </form>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="stage" id="sign">
+  <h2>Sign-off</h2>
+  {% if run.signed_date %}<p>Signed by {{ run.signed_by }} on {{ run.signed_date }}. Next run due {{ run.next_due }}.</p>
+  {% else %}
+  {% if missing %}<p>Steps without evidence: {{ missing|join(", ") }}.</p>{% endif %}
+  <form method="post" action="/cycle/runs/{{ run_id }}/sign" class="inline">
+    <label>Accountable executive <input name="signed_by"></label>
+    <label>Next run due <input name="next_due" type="date"></label>
+    <button type="submit">Sign</button>
+  </form>
+  <p><small>Signing dates the register: each live line's next review becomes the next run's date, or the date of a trigger still awaiting its decision if that is earlier.</small></p>
+  {% endif %}
+</section>
+{% endblock %}

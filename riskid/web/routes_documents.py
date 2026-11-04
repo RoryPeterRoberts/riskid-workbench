@@ -23,10 +23,10 @@ from riskid.web import get_store, render
 router = APIRouter()
 TYPES = {"xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
          "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-         "csv": "text/csv; charset=utf-8", "pdf": "application/pdf"}
+         "csv": "text/csv; charset=utf-8", "pdf": "application/pdf", "zip": "application/zip"}
 
 
-def _send(request, store, kind: str, name: str, fmt: str, body, prov: dict):
+def send_document(request, store, kind: str, name: str, fmt: str, body, prov: dict):
     if request.headers.get("sec-fetch-site") in ("cross-site", "same-site"):
         raise HTTPException(403, "Refused: a download is recorded in the audit trail, "
                                  "so it must come from the workbench's own pages.")
@@ -53,11 +53,11 @@ async def register_document(fmt: str, request: Request, store: Store = Depends(g
     if fmt == "html":
         return HTMLResponse(docs.html("register.html", table=table, prov=prov))
     if fmt == "xlsx":
-        return _send(request, store, "register", "register", fmt, register.to_xlsx(table, prov), prov)
+        return send_document(request, store, "register", "register", fmt, register.to_xlsx(table, prov), prov)
     if fmt == "csv":
-        return _send(request, store, "register", "register", fmt, register.to_csv(table, prov), prov)
+        return send_document(request, store, "register", "register", fmt, register.to_csv(table, prov), prov)
     if fmt == "pdf":
-        return _send(request, store, "register", "register", fmt,
+        return send_document(request, store, "register", "register", fmt,
                      docs.pdf(docs.html("register.html", table=table, prov=prov)), prov)
     raise HTTPException(404, "The register comes as xlsx, csv, pdf or html.")
 
@@ -74,9 +74,10 @@ async def fria_document(system_id: str, fmt: str, request: Request, store: Store
     if fmt == "html":
         return HTMLResponse(markup)
     if fmt == "docx":
-        return _send(request, store, "FRIA", f"fria-{system_id}", fmt, fria.to_docx(system, elements, prov), prov)
+        return send_document(request, store, "FRIA", f"fria-{system_id}", fmt,
+                             fria.to_docx(system, elements, prov), prov)
     if fmt == "pdf":
-        return _send(request, store, "FRIA", f"fria-{system_id}", fmt, docs.pdf(markup), prov)
+        return send_document(request, store, "FRIA", f"fria-{system_id}", fmt, docs.pdf(markup), prov)
     raise HTTPException(404, "The FRIA comes as docx, pdf or html.")
 
 
@@ -89,9 +90,9 @@ async def soa_document(fmt: str, request: Request, store: Store = Depends(get_st
     if fmt == "html":
         return HTMLResponse(markup)
     if fmt == "xlsx":
-        return _send(request, store, "SoA", "soa", fmt, soa.to_xlsx(table, prov), prov)
+        return send_document(request, store, "SoA", "soa", fmt, soa.to_xlsx(table, prov), prov)
     if fmt == "pdf":
-        return _send(request, store, "SoA", "soa", fmt, docs.pdf(markup), prov)
+        return send_document(request, store, "SoA", "soa", fmt, docs.pdf(markup), prov)
     raise HTTPException(404, "The SoA comes as xlsx, pdf or html.")
 
 
@@ -105,5 +106,5 @@ async def report_document(fmt: str, request: Request, store: Store = Depends(get
     if fmt == "html":
         return HTMLResponse(markup)
     if fmt == "pdf":
-        return _send(request, store, "board report", "board-report", fmt, docs.pdf(markup), prov)
+        return send_document(request, store, "board report", "board-report", fmt, docs.pdf(markup), prov)
     raise HTTPException(404, "The board report comes as pdf or html.")

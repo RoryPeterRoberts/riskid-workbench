@@ -91,6 +91,7 @@ def install(app, allowed_hosts) -> None:
     from riskid.web.routes_interact import router as interact
     from riskid.web.routes_register import router as register
     from riskid.web.routes_documents import router as documents
+    from riskid.web.routes_cycle import router as cycle
 
     app.add_middleware(SameOriginWrites)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(allowed_hosts))
@@ -104,3 +105,4 @@ def install(app, allowed_hosts) -> None:
     app.include_router(interact)
     app.include_router(register)
     app.include_router(documents)
+    app.include_router(cycle)

@@ -65,3 +65,11 @@ One line each (`PLAN.md` rule 11).
   (references and short titles); today it lists the cited ones.
 - round 12: the PDF line profile and the workshop record PDF of SPEC.md
   section 7 are not built; both have HTML pages.
+- round 13: the audit and management-review runs of chapter 13 are not built,
+  and neither is the annual run's comparison with last year's baseline.
+- round 13: the AI officer's countersignature of a significance decision
+  (chapter 13) has no field; a Trigger records only `decided_by`.
+- round 13: "several ambers on related lines are a pattern" (chapter 13) is
+  not detected; a person logs the trigger.
+- round 13: incidents, Article 73 reports and complaints have no log of their
+  own; an incident is logged as a trigger.

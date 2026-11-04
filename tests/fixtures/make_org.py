@@ -5,7 +5,8 @@ portfolio:
 
 * a **credit-scoring model** the organisation bought and configured, where it
   is the deployer and the Article 6 outcome is high-risk (Annex III);
-* a **customer-service chatbot** it deploys, carrying the Article 50 duty;
+* a **customer-service chatbot** it deploys, carrying the Article 50 duty, now
+  running a model version (2026-09) newer than the one last assessed (2026-05);
 * a **CV-screening tool** that is still in pilot well past its end date.
 
 Run as a script, :func:`build_org` writes the fixture to
@@ -68,6 +69,8 @@ SYSTEMS = (
         supplier="Helix Conversations",
         model_provider="OpenAI",
         model_name="gpt-4o",
+        model_version="2026-09",
+        last_risk_assessment={"date": "2026-06-15", "version": "2026-05"},
         role_under_act="deployer",
         article_6_outcome="no further class",
         article_50_duty="yes",

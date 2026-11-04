@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<nav class="tabs"><a href="#indicators">Indicators</a><a href="#triggers">Triggers</a><a href="#calendar">Calendar</a><a href="#runs">Runs</a><a href="#due">Next reviews</a></nav>
+
+<section class="stage" id="indicators">
+  <h2>Indicator sheet</h2>
+  <p class="record">Read monthly for each material line. Amber starts an investigation; red goes to the AI officer the same week and logs a trigger. A falling override rate is read as seriously as a rise (HUM-01).</p>
+  {% if indicators %}
+  <div class="scroll"><table class="grid">
+    <thead><tr><th>ID</th><th>Line</th><th>Indicator</th><th>Amber</th><th>Red</th><th>Current</th><th>Status</th><th>Read by</th><th>New reading</th></tr></thead>
+    <tbody>{% for k, kri, status in indicators %}{% set last = (kri.history or [])[-1:] %}
+    <tr><td>{{ k }}</td><td class="nowrap">{{ kri.line_id }}</td><td>{{ kri.name }}<br><small>{{ kri.thresholds.direction }}</small></td>
+      <td>{{ kri.thresholds.amber }}{{ kri.unit or "" }}</td><td>{{ kri.thresholds.red }}{{ kri.unit or "" }}</td>
+      <td>{% if kri.current_value is not none %}{{ kri.current_value }}{{ kri.unit or "" }}<br><small class="nowrap">{{ last[0].date }}</small>{% endif %}</td>
+      <td class="rag {{ status }}">{{ status or "not read" }}</td>
+      <td>{{ kri.read_by }}</td>
+      <td><form method="post" action="/cycle/indicators/{{ k }}/value" class="inline">
+        <input name="value" size="6" aria-label="Value for {{ k }}"><input name="date" type="date" value="{{ today }}" aria-label="Date of the reading for {{ k }}">
+        <button type="submit">Record</button></form></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="empty">No indicators yet. An indicator with no threshold, no owner or no review date is decoration (chapter 13).</p>{% endif %}
+  <h3>Set an indicator</h3>
+  <form method="post" action="/cycle/indicators" class="inline">
+    <label>Line <select name="line_id">{% for l in live %}<option value="{{ l }}"{% if values.line_id == l %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>
+    <label>Indicator <input name="name" list="preset-names" value="{{ values.name or "" }}" size="32"></label>
+    <label>Unit <input name="unit" size="4" value="{{ values.unit or "" }}" placeholder="%"></label>
+    <label>Amber at <input name="amber" size="5" value="{{ values.amber or "" }}"></label>
+    <label>Red at <input name="red" size="5" value="{{ values.red or "" }}"></label>
+    <label>Worse when <select name="direction">{% for d in directions %}<option value="{{ d }}"{% if values.direction == d %} selected{% endif %}>{{ d }}</option>{% endfor %}</select></label>
+    <label>Read by <input name="read_by" list="preset-readers" value="{{ values.read_by or "" }}"></label>
+    <button type="submit">Set</button>
+  </form>
+  <datalist id="preset-names">{% for p in presets %}<option value="{{ p.name }}">{% endfor %}</datalist>
+  <datalist id="preset-readers">{% for r in presets|map(attribute="read_by")|unique %}<option value="{{ r }}">{% endfor %}</datalist>
+  {% if suggested %}<h3>Chapter 13 indicators for lines in this register</h3>
+  <ul class="why-list">{% for p in suggested %}<li><strong>{{ p.name }}</strong> ({{ p.lines|join(", ") }}): {{ p.meaning }}. Read by {{ p.read_by }}.</li>{% endfor %}</ul>{% endif %}
+</section>
+
+<section class="stage" id="triggers">
+  <h2>Trigger log</h2>
+  <p class="record">A vendor update, an incident or near-miss, a change in guidance or law, a new use or population, or a date. Each brings forward the review of the lines it touches, and each needs a decision on whether it is significant: the system owner decides within the working week and records the reason.</p>
+  {% for k, t in triggers %}
+  <div class="card" id="{{ k }}">
+    <h3>{{ k }} <small>{{ t.date }}, {{ t.source }}</small></h3>
+    <p>{{ t.text }}</p>
+    {% if t.lines_touched %}<ul class="why-list">{% for x in t.lines_touched %}<li>{{ x.line_id }}: {{ x.why }}</li>{% endfor %}</ul>
+    {% else %}<p class="empty">Touches no live line by name, article or indicator; decide whether it touches one the matcher cannot see.</p>{% endif %}
+    {% if t.resulting_changes %}<p><small>Next review brought forward to {{ t.date }}: {{ t.resulting_changes|map(attribute="line_id")|join(", ") }}.</small></p>{% endif %}
+    {% if t.significance %}<p><span class="flag">{{ "significant" if t.significance == "significant" else "not significant" }}</span> {{ t.decision }} <small>({{ t.decided_by }})</small></p>{% endif %}
+    <form method="post" action="/cycle/triggers/{{ k }}/decision" class="inline">
+      <label>{{ "Revise the decision" if t.significance else "Decision" }} <select name="significance">{% for s in significance %}<option value="{{ s }}"{% if (t.significance or "significant") == s %} selected{% endif %}>{{ "significant" if s == "significant" else "not significant" }}</option>{% endfor %}</select></label>
+      <label>Reason and what follows <input name="decision" size="48"></label>
+      <button type="submit">Record</button>
+    </form>
+  </div>
+  {% else %}<p class="empty">No triggers logged.</p>{% endfor %}
+  <h3>Log a trigger</h3>
+  <form method="post" action="/cycle/triggers" class="stacked">
+    <label>Date <input name="date" type="date" value="{{ values.date or today }}"></label>
+    <label>Source <input name="source" value="{{ values.source or "" }}" placeholder="the supplier's change notice"></label>
+    <label>What happened <textarea name="text" rows="3">{{ values.text or "" }}</textarea></label>
+    <button type="submit">Log</button>
+  </form>
+</section>
+
+<section class="stage" id="calendar">
+  <h2>Regulatory calendar</h2>
+  <p class="record">The role-and-date calendar of chapter 15, as at 14 October 2026. Start a readiness review well before each date (LEG-09).</p>
+  <div class="scroll"><table class="grid">
+    <thead><tr><th>Applies from</th><th>Who</th><th>What</th><th>Articles</th><th></th></tr></thead>
+    <tbody>{% for e in calendar %}<tr><td>{{ e.as_written }}</td><td>{{ e.role }}</td><td>{{ e.applies }}</td><td>{{ e.articles }}</td><td class="nowrap">{{ e.status }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+
+<section class="stage" id="runs">
+  <h2>Runs</h2>
+  <p class="record">Each quarter re-identifies: re-assessment asks whether the risks on the list have changed; re-identification asks whether the list is still the right list. The annual run starts again from the beginning.</p>
+  {% if runs %}<table class="grid">
+    <thead><tr><th>Run</th><th>Kind</th><th>Date</th><th>Signed</th><th>Next run due</th></tr></thead>
+    <tbody>{% for k, r in runs %}<tr><td><a href="/cycle/runs/{{ k }}">{{ k }}</a></td><td>{{ r.kind }}</td><td>{{ r.date }}</td><td>{% if r.signed_date %}{{ r.signed_by }}, {{ r.signed_date }}{% else %}open{% endif %}</td><td>{{ r.next_due or "" }}</td></tr>{% endfor %}</tbody>
+  </table>{% else %}<p class="empty">No runs yet.</p>{% endif %}
+  <form method="post" action="/cycle/runs" class="inline">
+    <label>Kind <select name="kind">{% for k in run_kinds %}<option value="{{ k }}">{{ k }}</option>{% endfor %}</select></label>
+    <label>Date <input name="date" type="date" value="{{ today }}"></label>
+    <button type="submit">Open a run</button>
+  </form>
+  <p><a href="/cycle/evidence-pack.zip">Download the evidence pack</a> <small>(recorded as a document)</small></p>
+</section>
+
+<section class="stage" id="due">
+  <h2>Next reviews</h2>
+  {% if due %}<table class="grid">
+    <thead><tr><th>Line</th><th>Next review</th></tr></thead>
+    <tbody>{% for when, line in due %}<tr><td>{{ line }}</td><td>{{ when }}{% if when < today %} <span class="flag">overdue</span>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>{% else %}<p class="empty">No review dates yet; a trigger or a signed run sets them.</p>{% endif %}
+  {% if undated %}<p><small>{{ undated }} live lines have no review date yet.</small></p>{% endif %}
+</section>
+{% endblock %}

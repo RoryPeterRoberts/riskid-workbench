@@ -201,21 +201,19 @@ class Store:
 
     # -- time travel: the audit trail replayed ----------------------------
 
-    def replay(self, when) -> dict:
+    def replay(self, when=None, *, seq: int | None = None) -> dict:
         """Reconstruct every entity as it stood on ``when``, from the event table only.
 
         Returns the same {entity: {entity_id: state}} shape as :meth:`state`,
         but rebuilt from events up to and including ``when``. A bare date means
         the whole of that UTC day (so everything on it is included, not just
-        its midnight); a datetime means up to that instant. A line retired later
-        still appears here (its events are never deleted); a line that had not
-        yet been created is absent.
+        its midnight); a datetime means up to that instant. With ``seq``, it is
+        as things stood just after that event. A line retired later still
+        appears here (its events are never deleted); a line not yet created is absent.
         """
+        where, arg = ("seq <= ?", seq) if seq is not None else ("ts <= ?", _replay_cutoff(when))
         rows = self._conn.execute(
-            "SELECT entity, entity_id, field, new FROM events WHERE ts <= ? "
-            "ORDER BY seq",
-            (_replay_cutoff(when),),
-        ).fetchall()
+            f"SELECT entity, entity_id, field, new FROM events WHERE {where} ORDER BY seq", (arg,)).fetchall()
         snap: dict = {}
         for r in rows:
             _apply_event(snap, _EventRow(r))

@@ -313,3 +313,17 @@ For contracts with suppliers of AI models, systems or services (Chapters 5 and 7
 | 15 | Fairness evidence | Performance results by group, and the supplier's bias testing method | FAI-04 | A.10.3 |
 | 16 | Use restrictions | Intended-use limits, prohibited uses, and the supplier's monitoring of misuse | HUM-03, HUM-04 | A.9.4 |
 | 17 | Change of control | Notice and termination rights if the supplier is acquired or changes its terms | OPS-02 | A.10.3 |
+
+## Chapter 15: the Act by role and date (the role-and-date calendar)
+
+The Act applies by role and by date. The table sets out what applies to whom as at 14 October 2026.
+
+| Role | What applies | Articles | Applies from |
+|---|---|---|---|
+| Any provider or deployer | Prohibited practices; AI literacy | 5; 4 | 2 February 2025 |
+| Providers of general-purpose AI models | Documentation, copyright policy, training-content summary; more for systemic-risk models | 53, 55 | 2 August 2025 |
+| Providers and deployers of chatbots, synthetic content and deepfakes | Transparency | 50 | 2 August 2026 |
+| Providers of high-risk systems in the Annex III areas | Risk management, data governance, documentation, logging, oversight, accuracy; conformity assessment, registration, post-market monitoring, incident reporting | 9 to 15, 17, 43, 49, 72, 73 | 2 December 2027 |
+| Deployers of those systems | Use as instructed, oversight, monitoring, logs, notices to workers and affected persons, DPIA; impact assessment for public bodies, public-service providers and credit and life and health insurance pricing | 26, 27, 86 | 2 December 2027 |
+| Providers of AI that is, or is a safety component of, an Annex I product | High-risk obligations alongside product law | 6(1) | 2 August 2028 |
+| Systems on the market before those dates | Caught only if significantly changed in design; public-authority systems by 2 August 2030 | 111(2) | Not applicable |

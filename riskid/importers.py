@@ -101,3 +101,17 @@ def load_flags() -> dict:
     import json
 
     return json.loads((DATA_DIR / "flags.json").read_text(encoding="utf-8"))
+
+
+def load_calendar() -> list[dict]:
+    """The role-and-date calendar of chapter 15 (``calendar.json``)."""
+    import json
+
+    return json.loads((DATA_DIR / "calendar.json").read_text(encoding="utf-8"))["entries"]
+
+
+def load_checklist() -> list[dict]:
+    """The 18 steps of the B.8 quarterly checklist (``checklist.json``)."""
+    import json
+
+    return json.loads((DATA_DIR / "checklist.json").read_text(encoding="utf-8"))["steps"]

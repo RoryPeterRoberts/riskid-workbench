@@ -166,3 +166,18 @@ table.matrix td strong { color: var(--navy); }
 /* Register (round 11) */
 table.register td, table.register th { font-size: 0.85rem; min-width: 6rem; }
 table.register td:nth-child(3) { min-width: 16rem; }
+
+/* Cycle: indicator status, the trigger log, stacked forms */
+td.rag { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.04em; }
+td.rag.green { background: #E3F1E4; color: #1E5B2A; }
+td.rag.amber { background: #FBF0D9; color: #7A5200; }
+td.rag.red { background: var(--returned-bg); color: var(--returned); }
+.card { background: var(--paper); border: 1px solid var(--rule); padding: 0.5rem 0.75rem; margin: 0 0 0.75rem; }
+.card h3 small, section.stage h3 small { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+form.stacked { display: grid; gap: 0.5rem; max-width: 40rem; }
+form.stacked label { display: flex; flex-direction: column; font-size: 0.9rem; }
+form.stacked input, form.stacked textarea { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid #B9B3A0; border-radius: 3px; }
+form.stacked button { justify-self: start; }
+form.inline select { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid #B9B3A0; border-radius: 3px; background: #fff; }
+.nowrap { white-space: nowrap; }
+section.step .why-list { margin-bottom: 0.5rem; }

@@ -141,7 +141,21 @@ MODULES = {
               "banned Rite Aid from using facial-recognition surveillance in its stores for five "
               "years after false matches that fell disproportionately on women and people of colour."),
     ),
+    "cycle": Module(
+        key="cycle",
+        title="Cycle",
+        path="/cycle",
+        chapter=13,
+        chapter_title="The Ongoing Cycle: Re-Identification, Triggers, Indicators and Audit",
+        template="B.8 Quarterly Re-Identification Checklist",
+        why=("Re-assessment asks whether the risks on the list have changed. Re-identification asks whether "
+             "the list is still the right list."),
+        case=("Tay and Cruise: in March 2016 users trained Microsoft's Tay chatbot to post abusive content "
+              "within about a day; after a Cruise robotaxi dragged a pedestrian in October 2023, California "
+              "suspended its permits, and the business was wound down in December 2024."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact", "register", "documents"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact",
+                                 "register", "documents", "cycle"))
