@@ -1,0 +1,30 @@
+Risk ID
+L1 category
+L2
+Risk
+Definition (cause, event, consequence)
+Lifecycle stage
+Role exposed
+Who is harmed
+Unit of exposure
+Harm scored
+Likelihood
+Impact
+Dominant dimension
+Vulnerability
+Speed of onset
+Inherent score
+Inherent band
+Material
+Data quality
+Key controls (ISO/IEC 42001 Annex A)
+Catalogue controls (ai-management-system, MIT)
+Annex A refs with no catalogue control
+Target residual L
+Target residual I
+Target residual score
+Target residual band
+Owner (role)
+Key risk indicator
+Regulatory hooks
+Sources and precedents

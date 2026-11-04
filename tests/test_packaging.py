@@ -22,3 +22,4 @@ def test_data_templates_and_static_files_are_declared():
     data = config["tool"]["setuptools"]["package-data"]
     assert "data/*" in data["riskid"]
     assert {"templates/*", "static/*"} <= set(data["riskid.web"])
+    assert "templates/*" in data["riskid.documents"]

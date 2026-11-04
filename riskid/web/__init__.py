@@ -90,6 +90,7 @@ def install(app, allowed_hosts) -> None:
     from riskid.web.routes_assess import router as assess
     from riskid.web.routes_interact import router as interact
     from riskid.web.routes_register import router as register
+    from riskid.web.routes_documents import router as documents
 
     app.add_middleware(SameOriginWrites)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(allowed_hosts))
@@ -102,3 +103,4 @@ def install(app, allowed_hosts) -> None:
     app.include_router(assess)
     app.include_router(interact)
     app.include_router(register)
+    app.include_router(documents)

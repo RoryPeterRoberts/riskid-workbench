@@ -1,0 +1,11 @@
+{% extends "doc_base.html" %}
+{% block title %}AI risk register{% endblock %}
+{% block orientation %}landscape{% endblock %}
+{% block body %}
+<h1>AI risk register</h1>
+<p><small>The live lines, with the book's register columns that a page can carry; the XLSX and CSV hold all thirty.</small></p>
+<table>
+  <thead><tr><th>Risk ID</th><th>Risk</th><th>Owner</th><th>L</th><th>I</th><th>Inherent</th><th>Material</th><th>Data quality</th><th>Residual</th><th>Key controls</th></tr></thead>
+  <tbody>{% for r in table %}<tr><td>{{ r[0] }}</td><td>{{ r[3] or "" }}<br><small>{{ r[4] or "" }}</small></td><td>{{ r[26] or "" }}</td><td>{{ r[10] or "" }}</td><td>{{ r[11] or "" }}</td><td>{{ r[15] or "" }} {{ r[16] or "" }}</td><td>{{ r[17] or "" }}</td><td>{{ r[18] or "" }}</td><td>{{ r[24] or "" }} {{ r[25] or "" }}</td><td><small>{{ r[19] or "" }}</small></td></tr>{% else %}<tr><td colspan="10">No live lines.</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

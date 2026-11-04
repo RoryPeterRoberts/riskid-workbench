@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %}</title>
+<style>
+  @page { size: A4 {% block orientation %}portrait{% endblock %}; margin: 16mm 14mm 20mm; @bottom-left { content: "RiskID Workbench · {{ prov.pack_versions }}"; font-size: 7pt; color: #555; } @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 7pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 9pt; color: #1B2A4A; }
+  h1 { font-size: 15pt; border-bottom: 2px solid #C5A55A; padding-bottom: 4px; margin: 0 0 6px; }
+  h2 { font-size: 11pt; margin: 14px 0 4px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #D9D4C4; padding: 3px 5px; vertical-align: top; text-align: left; }
+  th { background: #1B2A4A; color: #fff; }
+  .source { color: #5A6478; font-size: 8pt; }
+  .provenance { margin-top: 14px; padding-top: 6px; border-top: 1px solid #D9D4C4; font-size: 8pt; color: #5A6478; }
+  small { color: #5A6478; }
+  td ul, li ul { margin: 0; padding-left: 12px; }
+  .provenance { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+{% block body %}{% endblock %}
+<p class="provenance">Built from data packs {{ prov.pack_versions }}; register state hash {{ prov.state_hash }}; generated {{ prov.generated_at }} by {{ prov.generated_by }}.</p>
+</body>
+</html>

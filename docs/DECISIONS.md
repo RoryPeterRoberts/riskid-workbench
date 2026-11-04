@@ -235,3 +235,24 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
 - round 11: chapter 11's signs of a living inventory (owners named, Medium
   ratings, interaction summaries, disagreement entries, staggered review
   dates) are shown under the grid. 2026-11-04.
+- round 12: the register XLSX and CSV have the thirty columns of the book's
+  register file, in its order (`tests/reference/columns.txt`). Two describe
+  the book's own control catalogue and stay empty; the "Target residual"
+  columns hold the latest assessment's residual. 2026-11-04.
+- round 12: every document records the data-pack versions and a SHA-256 of
+  the state it was built from (documents excluded, so generating one does not
+  change the hash): an About sheet in XLSX, a first `#` line in CSV, a
+  paragraph in DOCX, a footer in PDF and HTML. Each download is recorded as a
+  Document (DOC-nnn) in the audit trail; the HTML previews are not. 2026-11-04.
+- round 12: the FRIA assembles Article 27(1)'s six elements from the fields
+  B.7 maps to each and names those fields as its source; an element with
+  nothing recorded says what is missing. 2026-11-04.
+- round 12: the SoA lists the Annex A references on live lines (B.3 field 19
+  and each control's Annex A reference), with the lines as the justification;
+  a reference cited by a material line is included. The full list of 38
+  controls, for exclusions, needs the Annex A list as a data pack. 2026-11-04.
+- round 12: the Principal AI Risk Report has chapter 12's twelve items, each
+  with its source; items fed by indicators, incidents and the calendar say
+  they come with the Cycle round. 2026-11-04.
+- round 12: PDFs are rendered from HTML templates in `riskid/documents/` by
+  WeasyPrint (named in `PLAN.md` section 2). 2026-11-04.

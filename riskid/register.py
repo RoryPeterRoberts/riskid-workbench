@@ -18,7 +18,8 @@ from riskid.interact import LETTER
 COSO = ("strategic", "operations", "reporting", "compliance")
 
 
-def _assessments(state: dict, line_id: str) -> list:
+def assessments_of(state: dict, line_id: str) -> list:
+    """A line's assessments, oldest first, as ``(as_id, assessment)``."""
     return [(i, a) for i, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0].rsplit("-", 1)[-1]))
             if a.get("line_id") == line_id]
 
@@ -66,7 +67,7 @@ def grid_rows(state: dict, library: dict, taxonomy: dict) -> list:
             "residual_band": rules.band(a["residual"]) if a and a.get("residual") else None,
             "interactions": interaction_summary(state, line_id),
             "indicators": lib.kri if lib else "",
-            "trend": trend(_assessments(state, line_id)),
+            "trend": trend(assessments_of(state, line_id)),
             "last_review": a.get("date") if a else None,
         })
     return rows
