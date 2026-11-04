@@ -19,7 +19,7 @@ COSO = ("strategic", "operations", "reporting", "compliance")
 
 
 def _assessments(state: dict, line_id: str) -> list:
-    return [(i, a) for i, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0][3:]))
+    return [(i, a) for i, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0].rsplit("-", 1)[-1]))
             if a.get("line_id") == line_id]
 
 
