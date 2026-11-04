@@ -127,3 +127,21 @@ def test_annex_a_refs():
     assert annex_a_refs("Classification record per system (Art 6(4)); legal review at "
                         "inception (A.6.2.2); change triggers (6.3)") == ["A.6.2.2"]
     assert annex_a_refs("") == []
+
+
+def test_an_unclassified_system_still_engages_articles_4_and_6():
+    unclassified = System(role_under_act="deployer", lifecycle_stage="operation and monitoring")
+    hooks = engaged_hooks(unclassified)
+    assert ("AI Act", 4) in hooks
+    assert hooks[("AI Act", 6)] == ["no Article 6 classification is recorded for the system"]
+    assert "LEG-07" in _ids(propose_lines(unclassified))
+
+
+def test_persons_affected_reason_ignores_case():
+    line = LIBRARY["HUM-01"]
+    shouted = type(line)(**{**line.to_dict(), "harmed": "Individuals; Organisation"})
+    system = System(role_under_act="deployer", lifecycle_stage="operation and monitoring",
+                    article_6_outcome="no further class",
+                    persons_affected=[{"group": "applicants", "vulnerable": False}])
+    (_, reasons), = propose_lines(system, [shouted])
+    assert "persons affected: applicants" in reasons

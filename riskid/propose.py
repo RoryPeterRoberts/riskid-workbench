@@ -98,9 +98,11 @@ def engaged_hooks(system) -> dict:
     outcome = _field(system, "article_6_outcome")
     role = _field(system, "role_under_act")
     bought = _field(system, "vendor_or_built")
-    if outcome and outcome != "out of scope":
+    if outcome != "out of scope":
+        # Unrecorded is not out of scope: an unclassified system is LEG-07's concern.
         add(AI_ACT, (4,), "AI literacy applies to every AI system")
-        add(AI_ACT, (6,), "the system's Article 6 classification")
+        add(AI_ACT, (6,), "the system's Article 6 classification" if outcome
+            else "no Article 6 classification is recorded for the system")
     if outcome == "prohibited":
         add(AI_ACT, (5,), "classified as a prohibited practice")
     if outcome in _HIGH_RISK:
@@ -171,7 +173,7 @@ def screen_lines(system, lines=None) -> tuple[list, list]:
                                    f"at {stage}, and none of the articles it cites is engaged"]))
             continue
         reasons = ([stage_reason] if stage_reason else []) + [role_reason] + hook_reasons
-        if groups and any(h in _split(line.harmed) for h in _PEOPLE):
+        if groups and any(h.lower() in _PEOPLE for h in _split(line.harmed)):
             reasons.append(f"persons affected: {', '.join(groups)}")
         proposed.append((line, reasons))
     return proposed, removed
