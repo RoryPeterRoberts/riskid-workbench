@@ -53,3 +53,11 @@ One line each (`PLAN.md` rule 11).
   as comparable keys.
 - round 10: B.3 field 11 (risk interaction summary) could be filled from the
   matrix and the bow-tie reference on each line.
+- round 11: chapter 11's risk profile has fourteen elements (drivers, exposure,
+  cost-benefit, incident history among them); the profile page shows the
+  line's fields, assessments, controls, disagreements and trail, and the PDF
+  profile of SPEC.md section 7 comes with the Documents round.
+- round 11: chapter 11's governance rule that a change is reviewed by someone
+  outside the system's team before it takes effect is not enforced.
+- round 11: `riskid/store.py` is at the 400-line limit; the next store change
+  should first move `init` and `rebuild` to their own module.

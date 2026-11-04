@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block heading %}{{ line_id }}: {{ title }}{% endblock %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p>{{ line.status }}{% if line.status == "retired" %}: {{ line.retired_reason }}{% endif %} · {{ line.source }} · {{ line.system_id }} · <a href="/register">The register</a>{% if line.status != "retired" %} · <a href="/assess/{{ line_id }}">Assess</a>{% endif %}</p>
+<dl class="record">
+  <dt>Taxonomy</dt><dd>{{ row.taxonomy if row else line.l1 ~ " " ~ line.l2 }}</dd>
+  <dt>Risk definition</dt><dd>{{ line.definition or "" }}</dd>
+  <dt>COSO objective category</dt><dd>{{ line.coso_category or "not set" }}</dd>
+  <dt>Risk owner</dt><dd>{{ line.owner or "not named" }}</dd>
+  <dt>Interactions</dt><dd>{{ row.interactions if row and row.interactions else "none recorded" }}</dd>
+  <dt>Key risk indicators</dt><dd>{{ row.indicators if row else "" }}</dd>
+  <dt>Lifecycle, role, persons affected</dt><dd>{{ line.lifecycle_stages|join("; ") }} · {{ line.role or "" }} · {{ line.persons_affected|join("; ") }}</dd>
+  <dt>Regulatory hooks</dt><dd>{{ line.regulatory_hooks|join("; ") }}</dd>
+  <dt>Annex A controls</dt><dd>{{ line.annex_a_controls|join(", ") }}</dd>
+</dl>
+
+<h2>Assessments</h2>
+{% if assessments %}
+<table class="grid"><thead><tr><th>ID</th><th>Date</th><th>Assessor</th><th>Inherent</th><th>Residual</th><th>Material</th><th>Data quality</th></tr></thead>
+  <tbody>{% for as_id, a in assessments %}<tr><td>{{ as_id }}</td><td>{{ a.date }}</td><td>{{ a.assessor }}</td><td>{{ a.inherent }} {{ a.inherent_band }}</td><td>{{ a.residual }}</td><td>{{ "Y" if a.material else "N" }}</td><td>{{ a.data_quality }}: <small>{{ a.data_quality_basis }}</small></td></tr>{% endfor %}</tbody>
+</table>
+{% else %}<p class="empty">Not assessed.</p>{% endif %}
+
+<h2>Controls</h2>
+{% if controls %}
+<table class="grid"><thead><tr><th>ID</th><th>Control</th><th>Type</th><th>Owner</th><th>Last test</th><th>Result</th><th>Evidence</th></tr></thead>
+  <tbody>{% for ct_id, c in controls %}<tr><td>{{ ct_id }}</td><td>{{ c.name }}</td><td>{{ c.type }}</td><td>{{ c.owner or "" }}</td><td>{{ c.last_test_date or "untested" }}</td><td>{{ c.last_test_result or "" }}</td><td>{{ c.evidence_ref or "" }}</td></tr>{% endfor %}</tbody>
+</table>
+{% else %}<p class="empty">No controls listed.</p>{% endif %}
+
+{% if disagreements %}<h2>Disagreements</h2>{% for dl_id, d in disagreements %}<p>{{ dl_id }}: {{ d.holder }}, minority {{ d.minority_score }} on {{ d.dimension }} ({{ d.status }}){% if d.evidence %}; {{ d.evidence }}{% endif %}</p>{% endfor %}{% endif %}
+
+{% if line.status != "retired" %}
+<details class="removed"><summary>Edit the owner, COSO category or definition</summary>
+  <form method="post" action="/register/{{ line_id }}" class="b1">
+    <label class="field"><span>Risk owner: a named person, never a committee or a vendor</span><input name="owner" value="{{ line.owner or '' }}"></label>
+    <label class="field"><span>COSO objective category</span><select name="coso_category"><option value=""></option>{% for c in coso %}<option value="{{ c }}"{% if line.coso_category == c %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Risk definition</span><textarea name="definition" rows="2">{{ line.definition or "" }}</textarea></label>
+    <label class="field"><span>Reason for the change</span><input name="change_reason"></label>
+    <button type="submit">Save</button>
+  </form>
+</details>
+<details class="removed"><summary>Retire this line</summary>
+  <form method="post" action="/register/{{ line_id }}/retire" class="inline"><label>Reason <input name="reason" size="50"></label><button type="submit">Retire</button></form>
+</details>
+{% endif %}
+
+<section class="stage" id="trail">
+  <h2>Audit trail</h2>
+  <p class="record">Every change on the line and on what hangs from it, with the date, the person and the reason.</p>
+  <table class="grid"><thead><tr><th>When (UTC)</th><th>Who</th><th>What</th><th>Field</th><th>Reason</th></tr></thead>
+    <tbody>{% for e in trail %}<tr><td>{{ e.ts }}</td><td>{{ e.actor }}</td><td>{{ e.entity }} {{ e.entity_id }}</td><td>{{ e.field or "" }}{% if e.field %}: {{ e.summary }}{% endif %}</td><td>{{ e.reason or "" }}</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+{% endblock %}

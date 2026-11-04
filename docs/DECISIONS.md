@@ -217,3 +217,21 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   hidden concentration, and lists the Annex A controls several live lines
   rely on (chapter 10's five forms; the reviewer pool and data-source forms
   wait for those fields). 2026-11-04.
+- round 11: the Register grid is built from a state snapshot, so the replay
+  to a date (`/register?as_of=YYYY-MM-DD`, the whole of that day, UTC) uses
+  exactly the code of the live grid. 2026-11-04.
+- round 11: B.3's fields that no earlier screen sets are set here: the owner
+  (a named person) and the COSO objective category (strategic, operations,
+  reporting, compliance), with the definition, each change carrying a reason.
+  Retiring from the register needs a reason; the line keeps its ID, profile
+  and trail. 2026-11-04.
+- round 11: B.3 field 13 (trend) compares the last two assessments' inherent
+  scores, or reads "new"; field 11 (interactions) is read from the matrix and
+  the bow-ties; field 12 shows the library's key risk indicators until the
+  Cycle round records indicator values. 2026-11-04.
+- round 11: `Store.events()` returns the audit trail read-only; a line's
+  profile shows every event on the line and on its assessments, controls,
+  disagreements, use cases, links, bow-ties and resolutions. 2026-11-04.
+- round 11: chapter 11's signs of a living inventory (owners named, Medium
+  ratings, interaction summaries, disagreement entries, staggered review
+  dates) are shown under the grid. 2026-11-04.
