@@ -39,6 +39,7 @@
     <p class="why-row">Internal audit does not take part. Rotate one or two seats each cycle.</p>
     {% for seat in seats %}
     <label class="field"><span>{{ seat.role }}</span><input type="text" name="seat_{{ loop.index }}" value="{{ values.get('seat_%d' % loop.index, '') }}"><small>{{ seat.why }}</small></label>
+    <label class="check"><input type="checkbox" name="seat_{{ loop.index }}_absent"> absent</label>
     {% endfor %}
   </fieldset>
   <p class="actions"><button type="submit">Open the workshop</button></p>

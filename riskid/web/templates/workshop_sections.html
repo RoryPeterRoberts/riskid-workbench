@@ -13,8 +13,14 @@
     <p>{{ ws.date }} · facilitator {{ ws.facilitator }} · {{ ws.vote_allowance }} votes each</p>
     <table class="grid">
       <thead><tr><th>Seat</th><th>Person</th></tr></thead>
-      <tbody>{% for seat in ws.seats %}<tr><td>{{ seat.role }}</td><td>{{ seat.person }}</td></tr>{% else %}<tr><td colspan="2" class="empty">No seats filled.</td></tr>{% endfor %}</tbody>
+      <tbody>{% for seat in ws.seats %}<tr><td>{{ seat.role }}</td><td>{{ seat.person }}{% if not seat.present %} <span class="flag">absent</span>{% endif %}</td></tr>{% else %}<tr><td colspan="2" class="empty">No seats filled.</td></tr>{% endfor %}</tbody>
     </table>
+    {% if editable and open and ws.stage == 1 and ws.seats %}
+    <form method="post" action="/workshops/{{ ws_id }}/attendance" class="inline">
+      {% for seat in ws.seats %}<label><input type="checkbox" name="present_{{ loop.index0 }}"{% if seat.present %} checked{% endif %}> {{ seat.person }}</label>{% endfor %}
+      <button type="submit">Take attendance</button>
+    </form>
+    {% endif %}
     {% if editable %}
     <ul class="why-list">
       <li>Ask the overseer before the business owner, because the owner's view anchors the room.</li>
@@ -32,11 +38,10 @@
       {% for label, items in lists %}
       <div class="prelist"><strong>List {{ label }}</strong><ol>{% for item in items %}<li>{{ item }}</li>{% endfor %}</ol></div>
       {% else %}<p class="empty">No lists were written.</p>{% endfor %}
-      {% set named = candidates|selectattr("kind", "equalto", "line")|list %}
-      {% if named %}
+      {% if mentions %}
       <h3>Where they disagree</h3>
       <table class="grid"><thead><tr><th>Line</th><th>Risk</th><th>Named in</th></tr></thead>
-        <tbody>{% for c in named %}{% for f in c.from if "pre-workshop" in f %}<tr><td>{{ c.id }}</td><td>{{ titles.get(c.id, "") }}</td><td>{{ f }}{% if f.startswith("1 ") %} only{% endif %}</td></tr>{% endfor %}{% endfor %}</tbody>
+        <tbody>{% for line_id, count in mentions %}<tr><td>{{ line_id }}</td><td>{{ titles.get(line_id, "") }}</td><td>{{ count }} of {{ list_count }} lists{% if count == list_count %} (all agree){% endif %}</td></tr>{% endfor %}</tbody>
       </table>
       {% endif %}
     {% endif %}

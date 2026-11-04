@@ -51,7 +51,7 @@ COMPARED_SEATS = ("Overseer", "Data protection officer", "Security")
 ANSWERS = ("covered", "not known")
 MAX_LIST = 10
 
-_LINE_ID = re.compile(r"\b[A-Z]{3}-[0-9]{2}\b")
+LINE_ID = re.compile(r"\b[A-Z]{3}-[0-9]{2}\b")
 
 
 def pre_list_items(text: str) -> tuple[list, list]:
@@ -92,7 +92,7 @@ def candidates(workshop: dict, swift: list, known_ids) -> list:
 
     mentions: dict = {}
     for items in (workshop.get("pre_lists") or {}).values():
-        for line_id in dict.fromkeys(m for item in items for m in _LINE_ID.findall(item)):
+        for line_id in dict.fromkeys(m for item in items for m in LINE_ID.findall(item)):
             if line_id in known_ids:
                 mentions[line_id] = mentions.get(line_id, 0) + 1
     for line_id, count in mentions.items():

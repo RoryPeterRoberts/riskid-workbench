@@ -4,8 +4,8 @@ A workshop moves forward through the six stages of B.5. Each stage opens its
 own input: pre-workshop lists at stage 1 (hidden from everyone until stage 2,
 then shown anonymised), SWIFT answers from stage 3, emerging risks from stage
 4, votes at stage 5, the gap review at stage 6. Closing records the voted
-register lines as top-down candidates; emerging risks go to the taxonomy gap
-list. Every change is an event; a closed workshop takes no more changes.
+register lines as top-down candidates; emerging risks stay in the workshop's
+taxonomy gap list. Every change is an event; a closed workshop takes no more changes.
 """
 
 from __future__ import annotations
@@ -19,12 +19,12 @@ from fastapi.responses import RedirectResponse
 
 from riskid import importers
 from riskid.model import Event, LibraryLine, Workshop
-from riskid.propose import register_line_from_library
+from riskid.propose import propose_lines, register_line_from_library
 from riskid.store import Store
 from riskid.web import get_store, render
 from riskid.web.system_form import WHOLE_NUMBER
-from riskid.workshop import (SEATS, STAGES, candidates, check_answer, check_votes, pre_list_items,
-                             ranking, seat_differences)
+from riskid.workshop import (LINE_ID, SEATS, STAGES, candidates, check_answer, check_votes,
+                             pre_list_items, ranking, seat_differences)
 
 router = APIRouter()
 SWIFT = importers.load_swift()
@@ -51,6 +51,20 @@ def _change(request, store, ws_id, field, old, new, reason):
                        actor=request.app.state.actor, reason=reason))
 
 
+def _mentions(lists: list, known: set) -> list:
+    """(line, number of lists naming it), lines not on every list first (chapter 6)."""
+    counts: dict = {}
+    for items in lists:
+        for line_id in {m for item in items for m in LINE_ID.findall(item) if m in known}:
+            counts[line_id] = counts.get(line_id, 0) + 1
+    return sorted(counts.items(), key=lambda kv: (kv[1] == len(lists), -kv[1], kv[0]))
+
+
+def _participants(ws: dict) -> list:
+    """The people in the room: seated and not marked absent."""
+    return [s["person"] for s in ws["seats"] if s.get("person") and s.get("present", True)]
+
+
 def _context(store: Store, ws_id: str, ws: dict) -> dict:
     """Everything the facilitator view and the record show."""
     library = {d["id"]: LibraryLine.from_dict(d) for d in store.library()}
@@ -67,9 +81,9 @@ def _context(store: Store, ws_id: str, ws: dict) -> dict:
     return {"ws_id": ws_id, "ws": ws, "systems": systems, "stages": STAGES, "swift": SWIFT,
             "answers": ws.get("swift_answers") or {}, "candidates": found, "titles": titles,
             "ranked": ranking(ws.get("votes")), "diffs": seat_differences(ws.get("votes"), ws["seats"]),
-            "participants": [s["person"] for s in ws["seats"] if s.get("person")],
+            "participants": _participants(ws),
             "lists": [(chr(ord("A") + i), items) for i, items in enumerate(lists)],
-            "list_count": len(lists), "register": register}
+            "list_count": len(lists), "register": register, "mentions": _mentions(lists, known)}
 
 
 def _page(request, store, ws_id, ws, reasons=(), status_code=200):
@@ -110,7 +124,8 @@ async def workshop_create(request: Request, store: Store = Depends(get_store)):
     allowance = values.get("vote_allowance", "").strip()
     if not WHOLE_NUMBER.fullmatch(allowance) or not 1 <= int(allowance) <= 20:
         reasons.append("Votes per participant: a whole number from 1 to 20 (chapter 6: five to ten).")
-    seats = [{"role": seat["role"], "person": values.get(f"seat_{i}", "").strip(), "present": True}
+    seats = [{"role": seat["role"], "person": values.get(f"seat_{i}", "").strip(),
+              "present": not values.get(f"seat_{i}_absent")}
              for i, seat in enumerate(SEATS, start=1) if values.get(f"seat_{i}", "").strip()]
     people = [s["person"] for s in seats]
     if len(people) != len(set(people)):
@@ -140,8 +155,9 @@ async def workshop_record(ws_id: str, request: Request, store: Store = Depends(g
 async def workshop_advance(ws_id: str, request: Request, store: Store = Depends(get_store)):
     ws = _get(store, ws_id)
     _require(ws, ws_id, 1, 5, "Moving to the next stage")
-    _change(request, store, ws_id, "stage", ws["stage"], ws["stage"] + 1,
-            f"stage {ws['stage'] + 1}: {STAGES[ws['stage']]['name']}")
+    entering = STAGES[ws["stage"]]          # STAGES is 0-indexed, so this is stage + 1
+    _change(request, store, ws_id, "stage", ws["stage"], entering["n"],
+            f"stage {entering['n']}: {entering['name']}")
     return RedirectResponse(f"/workshops/{ws_id}#stage-{ws['stage'] + 1}", status_code=303)
 
 
@@ -180,6 +196,17 @@ async def workshop_emerging(ws_id: str, request: Request, store: Store = Depends
     return RedirectResponse(f"/workshops/{ws_id}#stage-4", status_code=303)
 
 
+@router.post("/workshops/{ws_id}/attendance")
+async def workshop_attendance(ws_id: str, request: Request, store: Store = Depends(get_store)):
+    """Stage 1 takes the attendance: a seat not ticked present is absent."""
+    ws = _get(store, ws_id)
+    _require(ws, ws_id, 1, 1, "Attendance")
+    form = await request.form()
+    seats = [dict(seat, present=bool(form.get(f"present_{i}"))) for i, seat in enumerate(ws["seats"])]
+    _change(request, store, ws_id, "seats", ws["seats"], seats, "attendance taken")
+    return RedirectResponse(f"/workshops/{ws_id}#stage-1", status_code=303)
+
+
 @router.post("/workshops/{ws_id}/gap")
 async def workshop_gap(ws_id: str, request: Request, store: Store = Depends(get_store)):
     ws = _get(store, ws_id)
@@ -197,11 +224,15 @@ async def workshop_close(ws_id: str, request: Request, store: Store = Depends(ge
     _require(ws, ws_id, 6, what="Closing")
     library = {d["id"]: LibraryLine.from_dict(d) for d in store.library()}
     register = store.state().get("register", {})
+    systems = store.state().get("system", {})
     with store.transaction():
         for entry in ranking(ws.get("votes")):
             line_id = entry["id"]
             if line_id in library and line_id not in register:
-                line = register_line_from_library(library[line_id], ws["system_ids"][0])
+                # The first system in scope that the line was proposed for, else the first.
+                proposed_for = [s for s in ws["system_ids"] if s in systems and line_id in
+                                {line.id for line, _ in propose_lines(systems[s], list(library.values()))}]
+                line = register_line_from_library(library[line_id], (proposed_for or ws["system_ids"])[0])
                 line.source = "top-down"
                 store.append(Event(entity="register", entity_id=line_id, new=line.to_dict(),
                                    actor=request.app.state.actor,
@@ -231,7 +262,7 @@ async def participant_entry(ws_id: str, request: Request, store: Store = Depends
     ws = _get(store, ws_id)
     form = await request.form()
     participant = str(form.get("participant", "")).strip()
-    if participant not in [s["person"] for s in ws["seats"] if s.get("person")]:
+    if participant not in _participants(ws):
         return _participant_page(request, store, ws_id, ws, "",
                                  ["Choose your seat's name from the list (B.5)."], 422)
     if "pre_list" in form:

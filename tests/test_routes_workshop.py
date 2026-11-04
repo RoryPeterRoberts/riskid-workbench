@@ -159,3 +159,56 @@ def test_workshops_list_and_errors(fixture_org):
     assert client.post("/workshops", data=dict(SEATED, system_ids="SYS-404")).status_code == 422
     assert client.post("/workshops", data=dict(SEATED, facilitator="")).status_code == 422
     assert client.get("/workshops/WS-404").status_code == 404
+
+
+# --- fixes from the interim review -------------------------------------------
+
+def test_attendance_is_recorded_and_absent_seats_do_not_take_part(fixture_org):
+    client = _client(fixture_org.path)
+    client.post("/workshops", data=dict(SEATED, seat_6_absent="on"))
+    seats = {s["person"]: s["present"] for s in _workshop(fixture_org.path)["seats"]}
+    assert seats == {"Ann Owner": True, "Ola Overseer": True, "Sid Sceptic": False}
+    refused = client.post("/workshops/WS-001/participant",
+                          data={"participant": "Sid Sceptic", "pre_list": "MOD-05"})
+    assert refused.status_code == 422
+    client.post("/workshops/WS-001/attendance", data={"present_0": "on", "present_2": "on"})
+    seats = {s["person"]: s["present"] for s in _workshop(fixture_org.path)["seats"]}
+    assert seats == {"Ann Owner": True, "Ola Overseer": False, "Sid Sceptic": True}
+    assert "absent" in client.get("/workshops/WS-001/record").text
+    _advance(client, 1)
+    assert client.post("/workshops/WS-001/attendance", data={}).status_code == 409
+
+
+def test_where_they_disagree_counts_lists(ws):
+    client, _ = ws
+    client.post("/workshops/WS-001/participant", data={"participant": "Ann Owner",
+                                                       "pre_list": "MOD-05\nHUM-01"})
+    client.post("/workshops/WS-001/participant", data={"participant": "Ola Overseer",
+                                                       "pre_list": "MOD-05"})
+    _advance(client, 1)
+    review = client.get("/workshops/WS-001").text.split('id="stage-2"')[1].split('id="stage-3"')[0]
+    assert "1 of 2 lists" in review and "2 of 2 lists (all agree)" in review
+    table = review.split("Where they disagree")[1]
+    assert table.index("HUM-01") < table.index("MOD-05")        # disagreement first
+
+
+def test_a_top_down_line_goes_to_a_system_it_was_proposed_for(fixture_org):
+    client = _client(fixture_org.path)
+    client.post("/workshops", data={"system_ids": ["SYS-001", "SYS-003"], "date": "2026-11-20",
+                                    "facilitator": "Fiona", "vote_allowance": "5", "seat_1": "Ann"})
+    client.post("/workshops/WS-001/participant", data={"participant": "Ann", "pre_list": "MOD-08"})
+    _advance(client, 4)
+    client.post("/workshops/WS-001/participant", data={"participant": "Ann", "vote_MOD-08": "2"})
+    _advance(client, 1)
+    client.post("/workshops/WS-001/close")
+    with Store(fixture_org.path) as store:
+        assert store.state()["register"]["MOD-08"]["system_id"] == "SYS-003"   # not the first, SYS-001
+
+
+def test_the_stage_event_names_the_stage_entered(ws):
+    client, path = ws
+    _advance(client, 1)
+    with Store(path) as store:
+        reason = store._conn.execute("SELECT reason FROM events WHERE entity = 'workshop' "
+                                     "AND field = 'stage'").fetchone()[0]
+    assert reason == "stage 2: Independent assessment review"
