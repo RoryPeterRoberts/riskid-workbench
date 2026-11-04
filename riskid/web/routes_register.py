@@ -71,8 +71,9 @@ async def profile(line_id: str, request: Request, store: Store = Depends(get_sto
 
 @router.post("/register/{line_id}")
 async def edit(line_id: str, request: Request, store: Store = Depends(get_store)):
-    line = _line(store, line_id)
+    # Read the form first: after the await, the line is read and written with no await between.
     form = {k: str(v).strip() for k, v in (await request.form()).items()}
+    line = _line(store, line_id)
     reasons = []
     if "owner" in form and not form["owner"]:
         reasons.append("Owner: a named person, never a committee or a vendor (B.3 field 5).")
@@ -94,10 +95,10 @@ async def edit(line_id: str, request: Request, store: Store = Depends(get_store)
 
 @router.post("/register/{line_id}/retire")
 async def retire(line_id: str, request: Request, store: Store = Depends(get_store)):
+    reason = str((await request.form()).get("reason", "")).strip()
     line = _line(store, line_id)
     if line.get("status") == "retired":
         raise HTTPException(409, f"{line_id} is already retired: {line.get('retired_reason')}")
-    reason = str((await request.form()).get("reason", "")).strip()
     if not reason:
         return _profile(request, store, line_id, line,
                         ["Retire: give the reason; the line keeps its ID and its history."], 422)
