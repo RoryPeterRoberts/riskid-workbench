@@ -3,7 +3,8 @@
 Each download is built from the current state, carries the data-pack versions
 and the register state hash, and is recorded as a Document (DOC-nnn) in the
 audit trail. The ``.html`` forms are previews of the same content and are not
-recorded.
+recorded. Because a download writes to the audit trail, one that the browser
+says another site's page asked for is refused, as other changes are.
 """
 
 from __future__ import annotations
@@ -26,6 +27,9 @@ TYPES = {"xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sh
 
 
 def _send(request, store, kind: str, name: str, fmt: str, body, prov: dict):
+    if request.headers.get("sec-fetch-site") in ("cross-site", "same-site"):
+        raise HTTPException(403, "Refused: a download is recorded in the audit trail, "
+                                 "so it must come from the workbench's own pages.")
     filename = f"riskid-{name}-{date.today().isoformat()}.{fmt}"
     record(store, kind, filename, prov, request.app.state.actor)
     return Response(body, media_type=TYPES[fmt],

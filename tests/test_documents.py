@@ -162,6 +162,15 @@ def test_each_download_is_recorded(org):
     assert "DOC-001" in client.get("/documents").text
 
 
+def test_a_download_another_site_asks_for_is_refused_and_not_recorded(org):
+    client, path = org
+    for site in ("cross-site", "same-site"):
+        assert client.get("/documents/register.csv", headers={"Sec-Fetch-Site": site}).status_code == 403
+    assert client.get("/documents/register.csv", headers={"Sec-Fetch-Site": "same-origin"}).status_code == 200
+    with Store(path) as store:
+        assert len(store.state()["document"]) == 1
+
+
 def test_documents_page_renders_for_an_empty_organisation(tmp_path):
     from riskid.store import init
     init(tmp_path / "e.riskid").close()
