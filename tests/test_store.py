@@ -237,3 +237,14 @@ def test_a_failed_init_leaves_no_file(tmp_path, monkeypatch):
     with pytest.raises(OSError):
         init(tmp_path / "org.riskid")
     assert not (tmp_path / "org.riskid").exists()
+
+
+def test_replay_to_an_event_separates_changes_within_one_second(tmp_path):
+    store = _store(tmp_path)
+    first = store.append(Event(entity="system", entity_id="SYS-001", new={"owner": "alice"},
+                               timestamp="2026-06-30T09:00:00Z", actor="t"))
+    store.append(Event(entity="system", entity_id="SYS-001", field="owner", old="alice", new="bob",
+                       timestamp="2026-06-30T09:00:00Z", actor="t"))     # the same second
+    assert store.replay("2026-06-30T09:00:00Z")["system"]["SYS-001"]["owner"] == "bob"
+    assert store.replay(seq=first)["system"]["SYS-001"]["owner"] == "alice"
+    store.close()

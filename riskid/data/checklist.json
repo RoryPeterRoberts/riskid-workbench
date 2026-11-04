@@ -1,0 +1,131 @@
+{
+  "source": "Appendix B, B.8 Quarterly Re-Identification Checklist (docs/BOOK_TABLES.md)",
+  "steps": [
+    {
+      "n": 1,
+      "group": "Inventory",
+      "step": "Run discovery and compare tools found with tools inventoried",
+      "evidence": "Discovery report and ratio",
+      "owner": "AI officer"
+    },
+    {
+      "n": 2,
+      "group": "Inventory",
+      "step": "List pilots past their end date",
+      "evidence": "Pilot register",
+      "owner": "AI officer"
+    },
+    {
+      "n": 3,
+      "group": "Inventory",
+      "step": "Confirm every material system has a named owner in post",
+      "evidence": "Inventory",
+      "owner": "AI officer"
+    },
+    {
+      "n": 4,
+      "group": "Inventory",
+      "step": "Check that the version assessed is the version running, for every material system",
+      "evidence": "Version record against logs",
+      "owner": "System owners"
+    },
+    {
+      "n": 5,
+      "group": "Context",
+      "step": "Update the external context: guidance, enforcement decisions, supplier notices, incidents elsewhere",
+      "evidence": "Context note mapped to the taxonomy",
+      "owner": "Compliance"
+    },
+    {
+      "n": 6,
+      "group": "Context",
+      "step": "Review the regulatory calendar for the next twelve months",
+      "evidence": "Calendar",
+      "owner": "Compliance"
+    },
+    {
+      "n": 7,
+      "group": "Context",
+      "step": "Classify again any system whose use changed; confirm the Article 6(4) records",
+      "evidence": "Classification records",
+      "owner": "Compliance"
+    },
+    {
+      "n": 8,
+      "group": "Triggers and indicators",
+      "step": "Confirm that every trigger since last quarter was processed and logged",
+      "evidence": "Trigger log",
+      "owner": "AI officer"
+    },
+    {
+      "n": 9,
+      "group": "Triggers and indicators",
+      "step": "Review the indicators for each material line: breaches, trends, whether thresholds still fit",
+      "evidence": "Indicator sheet",
+      "owner": "System owners"
+    },
+    {
+      "n": 10,
+      "group": "Workshop",
+      "step": "Collect each participant's written list of changes before the session",
+      "evidence": "Pre-workshop submissions",
+      "owner": "Facilitator"
+    },
+    {
+      "n": 11,
+      "group": "Workshop",
+      "step": "Run the focused SWIFT session with the change prompts",
+      "evidence": "Workshop record",
+      "owner": "Facilitator"
+    },
+    {
+      "n": 12,
+      "group": "Assessment",
+      "step": "Re-assess the material lines on fresh evidence and record the reason for any change",
+      "evidence": "Assessment records",
+      "owner": "Assessors"
+    },
+    {
+      "n": 13,
+      "group": "Assessment",
+      "step": "Review data quality ratings; lower any that rest on evidence about an earlier version",
+      "evidence": "Rating changes",
+      "owner": "Assessors"
+    },
+    {
+      "n": 14,
+      "group": "Assessment",
+      "step": "Test the assumption register against current evidence",
+      "evidence": "Assumption register",
+      "owner": "System owners"
+    },
+    {
+      "n": 15,
+      "group": "Close",
+      "step": "Reconcile with the bottom-up submissions and update the disagreement log",
+      "evidence": "Disagreement log",
+      "owner": "Risk function"
+    },
+    {
+      "n": 16,
+      "group": "Close",
+      "step": "Update the register: new lines, escalations, retired lines (retire with a reason, never delete)",
+      "evidence": "Register with audit trail",
+      "owner": "AI officer"
+    },
+    {
+      "n": 17,
+      "group": "Close",
+      "step": "Update the inputs to the board report and the Statement of Applicability if controls changed",
+      "evidence": "Report inputs; statement",
+      "owner": "AI officer"
+    },
+    {
+      "n": 18,
+      "group": "Close",
+      "step": "Obtain sign-off from the accountable executive and fix the date of the next run",
+      "evidence": "Signed record",
+      "owner": "Accountable executive"
+    }
+  ]
+}

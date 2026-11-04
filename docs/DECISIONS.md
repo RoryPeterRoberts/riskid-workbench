@@ -256,3 +256,50 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   they come with the Cycle round. 2026-11-04.
 - round 12: PDFs are rendered from HTML templates in `riskid/documents/` by
   WeasyPrint (named in `PLAN.md` section 2). 2026-11-04.
+- round 13: chapter 15's role-and-date calendar is added to `docs/BOOK_TABLES.md`
+  and generated into `calendar.json` (as at 14 October 2026), and B.8's 18
+  steps into `checklist.json`; neither is retyped. 2026-11-04.
+- round 13: an indicator needs a live line, amber and red thresholds that agree
+  with the direction that is worse, and the person who reads it ("an indicator
+  with no threshold, no owner or no review date is decoration", chapter 13).
+  Its current value is the latest-dated reading. A reading that turns it red
+  logs a trigger, because red "prompts a decision on an event-driven update";
+  staying red does not log another. 2026-11-04.
+- round 13: a trigger touches a live line when its text names the line, cites
+  an article the line's regulatory hooks cite (round 5's article lookup), or
+  shares words with one of the line's indicators or chapter 13 presets (two
+  words, or one of seven letters or more). The reason is shown for each, and
+  the person deciding significance judges it. Each touched line's next review
+  comes forward to the trigger's date (SPEC.md 5.7), and the trigger records
+  the changes it made. 2026-11-04.
+- round 13: the significance decision needs significant or not and the
+  reason; the form starts at significant ("when in doubt, treat the change as
+  significant", chapter 13). A decision does not move review dates back; the
+  next signed run sets them. 2026-11-04.
+- round 13: runs are quarterly or annual and work through B.8's 18 steps; the
+  monthly indicator review is the indicator sheet, and an event-driven update
+  is a trigger and its decision. Sign-off needs evidence on every step, every
+  step done, the accountable executive's name, and a next-run date after the
+  run's. It sets each live line's next review to the earlier of that date and
+  any trigger still awaiting its decision, and closes the run. 2026-11-04.
+- round 13: the run page shows what the register can answer for steps 1, 2,
+  3, 4, 6, 8, 9, 12, 15 and 16, as at the run's date. Step 4 lists every
+  system whose running version differs from its assessed one and says whether
+  it is material. 2026-11-04.
+- round 13: a run covers the events after the previous run's signing up to
+  its own, bounded by event sequence numbers, because timestamps are to the
+  second. The `signed_date` event is written last in a sign-off, and
+  `Store.replay(seq=...)` gives the state just after it, so a signed run's
+  pack holds the register as it stood at the signing. 2026-11-04.
+- round 13: the evidence pack holds the register, the heat maps, the FRIA of
+  each high-risk system, the SoA, the board report (PDF), each signed run's
+  checklist, the disagreement log and the audit trail. Both packs are recorded
+  as documents. 2026-11-04.
+- round 13: the board report's items 5, 7, 9 and 11 now read the Cycle: amber
+  and red indicators and the triggers since the last report, the OPS-05
+  indicator, the dates ahead on the calendar and the LEG-09 indicator, and
+  lines past their review date with the last signed run. 2026-11-04.
+- round 13: step 8 lists every trigger still without a significance decision,
+  whenever it was logged, not only those since the last run: B.8 asks that
+  every trigger since last quarter was processed, and one from an earlier
+  quarter that is still undecided was not processed either. 2026-11-04.

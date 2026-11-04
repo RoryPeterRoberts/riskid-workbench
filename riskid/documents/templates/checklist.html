@@ -1,0 +1,10 @@
+{% extends "doc_base.html" %}
+{% block title %}Re-identification checklist {{ run_id }}{% endblock %}
+{% block body %}
+<h1>Re-identification checklist {{ run_id }} (B.8)</h1>
+<p>{{ run.kind }} run of {{ run.date }}.{% if run.signed_by %} Signed by {{ run.signed_by }} on {{ run.signed_date }}; next run due {{ run.next_due }}.{% else %} Not yet signed.{% endif %}</p>
+<table>
+  <thead><tr><th>#</th><th>Step</th><th>Evidence</th><th>Owner</th><th>Done</th></tr></thead>
+  <tbody>{% for s in steps %}{% set r = (run.steps or {}).get(s.n|string) or {} %}<tr><td>{{ s.n }}</td><td>{{ s.group }}: {{ s.step }}</td><td>{{ r.evidence or "" }}</td><td>{{ r.owner or s.owner }}</td><td>{{ r.date or "" }}{% if r.done %} done{% endif %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}
