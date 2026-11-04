@@ -210,3 +210,30 @@ def test_fixture_risk_criteria_match_the_rules(fixture_org):
     assert "15 or more" in criteria      # §5.3: material at inherent >= 15
     assert "impact is 5" in criteria     # §5.3: ...or impact 5
     assert "article 5" in criteria       # ch 5: a prohibited practice is not accepted
+
+
+def test_a_transaction_keeps_all_its_events_or_none(tmp_path):
+    store = Store(tmp_path / "t.riskid")
+    with pytest.raises(RuntimeError):
+        with store.transaction():
+            store.append(Event(entity="system", entity_id="SYS-001", new={"owner": "a"}, actor="t"))
+            raise RuntimeError("interrupted")
+    assert store._conn.execute("SELECT count(*) FROM events").fetchone()[0] == 0
+    assert store.systems() == []
+    with store.transaction():
+        store.append(Event(entity="system", entity_id="SYS-001", new={"owner": "a"}, actor="t"))
+        store.append(Event(entity="system", entity_id="SYS-002", new={"owner": "b"}, actor="t"))
+    assert store._conn.execute("SELECT count(*) FROM events").fetchone()[0] == 2
+    store.close()
+
+
+def test_a_failed_init_leaves_no_file(tmp_path, monkeypatch):
+    from riskid import importers
+
+    def broken():
+        raise OSError("taxonomy unreadable")
+
+    monkeypatch.setattr(importers, "load_taxonomy", broken)
+    with pytest.raises(OSError):
+        init(tmp_path / "org.riskid")
+    assert not (tmp_path / "org.riskid").exists()

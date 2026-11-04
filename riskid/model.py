@@ -220,6 +220,8 @@ class UseCase(Model):
     date: str = None
     status: str = None                   # returned | accepted
     return_reason: str = None
+    source: str = None                   # the template or one of the ten sub-processes (ch 7)
+    line_id: str = None                  # the register line it created or supports
 
 
 # --- Workshop (B.5) ---------------------------------------------------------

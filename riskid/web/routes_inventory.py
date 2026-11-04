@@ -124,9 +124,10 @@ async def inventory_update(system_id: str, request: Request, store: Store = Depe
         return _form_page(request, system_id, values, reasons, status_code=422)
     updated = System.from_dict({**fields, "id": system_id}).to_dict()
     reason = values.get("change_reason", "").strip() or "inventory edit"
-    for name, value in updated.items():
-        if value != current.get(name):
-            store.append(Event(entity="system", entity_id=system_id, field=name,
-                               old=current.get(name), new=value,
-                               actor=request.app.state.actor, reason=reason))
+    with store.transaction():
+        for name, value in updated.items():
+            if value != current.get(name):
+                store.append(Event(entity="system", entity_id=system_id, field=name,
+                                   old=current.get(name), new=value,
+                                   actor=request.app.state.actor, reason=reason))
     return RedirectResponse(f"/inventory?saved={system_id}", status_code=303)

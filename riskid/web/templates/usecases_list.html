@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+{% if systems %}
+<form method="get" action="/usecases/new" class="inline picker">
+  <label>New use case for
+    <select name="system">{% for s in systems %}<option value="{{ s.id }}">{{ s.id }} {{ s.name }}</option>{% endfor %}</select>
+  </label>
+  <button type="submit">Start</button>
+</form>
+{% else %}
+<p class="empty">Add a system to the <a href="/inventory/new">Inventory</a> before its use cases.</p>
+{% endif %}
+
+<h2>Submissions</h2>
+{% if usecases %}
+<table class="grid">
+  <thead><tr><th>ID</th><th>System</th><th>Risk definition</th><th>Source</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for uc_id, u in usecases %}
+    <tr>
+      <td><a href="/usecases/{{ uc_id }}">{{ uc_id }}</a></td>
+      <td>{{ u.system_id }}<br><small>{{ names.get(u.system_id, "") }}</small></td>
+      <td>{{ u.fields_.definition or "" }}</td>
+      <td><small>{{ u.source }}</small></td>
+      <td>{% if u.status == "accepted" %}accepted as <strong>{{ u.line_id }}</strong>
+          {% else %}<span class="reasons">returned</span><ul class="why-list reasons">{% for r in u.return_reason.split("\n") %}<li>{{ r }}</li>{% endfor %}</ul>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No use cases yet.</p>
+{% endif %}
+
+<h2>Specialist sub-processes by system</h2>
+<p>Chapter 8 checks that all ten contributed. A tick means an accepted use case came from that sub-process.</p>
+{% for system, rows, count in coverage %}
+<details class="coverage"{% if count %} open{% endif %}>
+  <summary>{{ system.id }} {{ system.name }}: {{ count }} of 10</summary>
+  <ul class="checklist">{% for name, done in rows %}<li class="{{ 'done' if done else 'open' }}">{{ name }}</li>{% endfor %}</ul>
+</details>
+{% endfor %}
+{% endblock %}

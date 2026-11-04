@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block heading %}{% if uc_id %}Use case {{ uc_id }}: returned for correction{% else %}New use case{% endif %} for {{ system.id }} {{ system.name }}{% endblock %}
+{% block content %}
+{% if reasons %}
+<div class="returned" role="alert">
+  <p>Returned. Correct these and submit again:</p>
+  <ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<p>Complete one template for every risk, with the person who operates the system. The examples in grey are the book's MOD-05.</p>
+<form method="post" action="{% if uc_id %}/usecases/{{ uc_id }}{% else %}/usecases{% endif %}" class="b1">
+  <input type="hidden" name="system_id" value="{{ system.id }}">
+  <fieldset class="b1-row">
+    <h3>System header</h3>
+    {% for name, label, record, note in headers %}{% set v = values.get("header_" ~ name, "") %}
+    <label class="field">
+      <span>{{ label }}</span>
+      {% if name == "role" %}
+      <select name="header_role"><option value="">Choose</option>{% for r in roles %}<option value="{{ r }}"{% if v == r %} selected{% endif %}>{{ r }}</option>{% endfor %}</select>
+      {% elif name == "lifecycle_stage" %}
+      <select name="header_lifecycle_stage"><option value="">Choose</option>{% for s in stages %}<option value="{{ s }}"{% if v == s %} selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+      {% elif name == "purpose_and_users" %}
+      <textarea name="header_purpose_and_users" rows="2">{{ v }}</textarea>
+      {% else %}
+      <input type="text" name="header_{{ name }}" value="{{ v }}">
+      {% endif %}
+      <small>{{ record }}. {{ note }}.</small>
+    </label>
+    {% endfor %}
+    <label class="field">
+      <span>Source</span>
+      <select name="source">{% for s in sources %}<option value="{{ s }}"{% if values.get("source") == s %} selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+      <small>The general template, or the specialist sub-process that found the risk (chapter 7).</small>
+    </label>
+  </fieldset>
+
+  {% for number, name, label, what, example in fields %}
+  <fieldset class="b1-row">
+    <h3>{{ number }}. {{ label }}</h3>
+    <p class="record">{{ what }}</p>
+    {% if name == "taxonomy" %}
+    <select name="taxonomy"><option value="">Choose</option>{% for t in taxonomy %}<option value="{{ t.l2_code }}"{% if values.get("taxonomy") == t.l2_code %} selected{% endif %}>{{ t.l1_code }} {{ t.l2_code }} {{ t.l2 }}</option>{% endfor %}</select>
+    <small>Example (MOD-05): {{ example }}. Leave it empty when field 1 names a library line; its code is used.</small>
+    {% elif name == "controls" %}
+    <table class="grid controls">
+      <thead><tr><th>Control</th><th>Type</th><th>Last test</th><th>Evidence</th></tr></thead>
+      <tbody>
+      {% for i in control_rows %}{% set ex = control_examples[i - 1] if i <= control_examples|length else ("", "", "") %}
+        <tr>
+          <td><input type="text" name="control_{{ i }}_name" value="{{ values.get('control_%d_name' % i, '') }}" placeholder="{{ ex[0] }}"></td>
+          <td><select name="control_{{ i }}_type"><option value=""></option>{% for t in control_types %}<option value="{{ t }}"{% if values.get('control_%d_type' % i) == t %} selected{% endif %}>{{ t }}</option>{% endfor %}</select></td>
+          <td><input type="date" name="control_{{ i }}_test_date" value="{{ values.get('control_%d_test_date' % i, '') }}"></td>
+          <td><input type="text" name="control_{{ i }}_evidence" value="{{ values.get('control_%d_evidence' % i, '') }}" placeholder="{{ ex[2] }}"></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <small>A control called "human in the loop" or "human oversight" needs its override figure in the evidence (SPEC 5.5).</small>
+    {% elif name == "data_quality" %}
+    <select name="data_quality"><option value="">Choose</option>{% for d in data_quality %}<option value="{{ d }}"{% if values.get("data_quality") == d %} selected{% endif %}>{{ d }}</option>{% endfor %}</select>
+    <label class="field"><span>Basis</span><textarea name="data_quality_basis" rows="2" placeholder="{{ example }}">{{ values.get("data_quality_basis", "") }}</textarea></label>
+    <small>The rating describes the evidence behind the assessment, not the data the system uses. A Medium needs its basis (chapter 7).</small>
+    {% elif name in ("risk_id", "owner") %}
+    <input type="text" name="{{ name }}" value="{{ values.get(name, '') }}" placeholder="{{ example }}">
+    {% else %}
+    <textarea name="{{ name }}" rows="2" placeholder="{{ example }}">{{ values.get(name, "") }}</textarea>
+    {% endif %}
+  </fieldset>
+  {% endfor %}
+  <p class="actions"><button type="submit">Submit</button> <a href="/usecases">Cancel</a></p>
+</form>
+{% endblock %}

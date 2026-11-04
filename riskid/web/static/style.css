@@ -116,3 +116,11 @@ button.secondary { background: #fff; color: var(--navy); border: 1px solid var(-
 dl.record { display: grid; grid-template-columns: 12rem 1fr; gap: 0.4rem 1rem; background: var(--card); padding: 1rem; }
 dl.record dt { font-weight: 600; }
 dl.record dd { margin: 0; }
+
+/* Use cases (round 6) */
+table.controls input, table.controls select { width: 100%; font: inherit; padding: 0.25rem 0.4rem; border: 1px solid #B9B3A0; border-radius: 3px; }
+details.coverage { background: var(--card); border: 1px solid var(--rule); padding: 0.5rem 1rem; margin: 0 0 0.5rem; }
+details.coverage summary { cursor: pointer; font-weight: 600; }
+ul.checklist { columns: 2; margin: 0.5rem 0 0; padding-left: 1.2rem; }
+ul.checklist li.done::marker { content: "✓  "; color: #4C7A2A; }
+ul.checklist li.open { color: var(--muted); }

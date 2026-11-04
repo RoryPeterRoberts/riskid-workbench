@@ -49,6 +49,19 @@ MODULES = {
               "Article 8 ECHR; its risks had not been set out in any form the court could "
               "test (FAI-03)."),
     ),
+    "usecases": Module(
+        key="usecases",
+        title="Use cases",
+        path="/usecases",
+        chapter=7,
+        chapter_title="Bottom-Up Identification: The AI Use-Case Template and the Specialist Sub-Processes",
+        template="B.2 The AI Use-Case Template",
+        why=("Three fields decide whether a submission contains identification or only "
+             "classification: the drivers, the controls and the data quality rating."),
+        case=("The Model That Passed Its Own Test: in 2021 Michigan Medicine ran a widely "
+              "deployed sepsis model on its own patients and found it missed about two-thirds "
+              "of cases while alerting on about 18% of patients (MOD-02, MOD-08)."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
