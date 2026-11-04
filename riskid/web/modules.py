@@ -62,7 +62,20 @@ MODULES = {
               "deployed sepsis model on its own patients and found it missed about two-thirds "
               "of cases while alerting on about 18% of patients (MOD-02, MOD-08)."),
     ),
+    "workshop": Module(
+        key="workshop",
+        title="Workshop",
+        path="/workshops",
+        chapter=6,
+        chapter_title="Top-Down Identification: Workshops, SWIFT, Scenarios, Delphi and Red Teams",
+        template="B.4 SWIFT prompt set and B.5 workshop agenda",
+        why=("A room of senior people asked for the key risks tends to produce the risks "
+             "already on the register."),
+        case=("The Model That Priced the Market: in November 2021 Zillow shut down Zillow "
+              "Offers, whose algorithm set the prices it paid for homes; the model had not "
+              "kept pace with the market (MOD-06, SOC-06)."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES.values())
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases"))

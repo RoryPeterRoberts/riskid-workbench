@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block heading %}Workshop record {{ ws_id }}{% endblock %}
+{% block content %}
+<p>{% if ws.status == "closed" %}Closed.{% else %}In progress: stage {{ ws.stage }} of 6.{% endif %} <a href="/workshops/{{ ws_id }}">Facilitator view</a></p>
+{% with editable = false %}{% include "workshop_sections.html" %}{% endwith %}
+<section class="stage" id="outputs">
+  <h2>Outputs</h2>
+  <h3>Principal AI risk list</h3>
+  {% set principal = ranked|list %}
+  {% for e in principal %}<p>{{ loop.index }}. {{ e.id }} {{ titles.get(e.id, "") }}{% if register.get(e.id) %} <small>(in the register: {{ register[e.id].source }}, {{ register[e.id].status }})</small>{% endif %}</p>{% else %}<p class="empty">No votes recorded.</p>{% endfor %}
+  <h3>Emerging AI risks</h3>
+  {% for r in ws.emerging_risks %}<p>E{{ loop.index }}. {{ r.title }}</p>{% else %}<p class="empty">None.</p>{% endfor %}
+  <h3>Disagreement log entries</h3>
+  {% for d in diffs %}<p>{{ d.seat }} ({{ d.person }}) put {{ d.votes }} on {{ d.candidate }}; the business owner put {{ d.owner_votes }}.</p>{% else %}<p class="empty">None from the voting.</p>{% endfor %}
+</section>
+{% endblock %}

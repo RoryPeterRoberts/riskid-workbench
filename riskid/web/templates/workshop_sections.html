@@ -1,0 +1,101 @@
+{# The six stages of B.5, shared by the facilitator view (editable) and the record. #}
+{% set open = ws.status == "open" %}
+{% for st in stages %}
+<section class="stage{% if editable and ws.stage == st.n and open %} current{% endif %}" id="stage-{{ st.n }}">
+  <h2>{{ st.n }}. {{ st.name }}{% if editable %} <small>{{ st.duration }}</small>{% endif %}</h2>
+  <p class="record">{{ st.purpose }}.{% if editable %} <em>{{ st.for_ai }}.</em>{% endif %}</p>
+
+  {% if st.n == 1 %}
+    <table class="grid">
+      <thead><tr><th>System in scope</th><th>Version running today</th></tr></thead>
+      <tbody>{% for s in systems %}<tr><td>{{ s.id }} {{ s.name or "" }}</td><td>{{ s.model_name or "" }} {{ s.model_version or "not recorded" }}{% if s.last_change_notice %}<br><small>last change notice {{ s.last_change_notice }}</small>{% endif %}</td></tr>{% endfor %}</tbody>
+    </table>
+    <p>{{ ws.date }} · facilitator {{ ws.facilitator }} · {{ ws.vote_allowance }} votes each</p>
+    <table class="grid">
+      <thead><tr><th>Seat</th><th>Person</th></tr></thead>
+      <tbody>{% for seat in ws.seats %}<tr><td>{{ seat.role }}</td><td>{{ seat.person }}</td></tr>{% else %}<tr><td colspan="2" class="empty">No seats filled.</td></tr>{% endfor %}</tbody>
+    </table>
+    {% if editable %}
+    <ul class="why-list">
+      <li>Ask the overseer before the business owner, because the owner's view anchors the room.</li>
+      <li>Treat silence as a reason to ask again, and not as agreement.</li>
+      <li>When anyone says a system has been tested or validated, ask: against what, on whose data, and when (MOD-08).</li>
+      <li>Keep a risk on the list when a senior participant wants it removed on grounds of seniority, and record the challenge.</li>
+    </ul>
+    {% endif %}
+    <p>{{ list_count }} {{ "list" if list_count == 1 else "lists" }} received{% if ws.stage < 2 %}; hidden until stage 2{% endif %}.{% if editable and open and ws.stage == 1 %} <a href="/workshops/{{ ws_id }}/participant">Participant entry</a>{% endif %}</p>
+
+  {% elif st.n == 2 %}
+    {% if ws.stage < 2 %}
+    <p class="empty">Hidden until stage 2: the lists are written before anyone sees the straw man or another list.</p>
+    {% else %}
+      {% for label, items in lists %}
+      <div class="prelist"><strong>List {{ label }}</strong><ol>{% for item in items %}<li>{{ item }}</li>{% endfor %}</ol></div>
+      {% else %}<p class="empty">No lists were written.</p>{% endfor %}
+      {% set named = candidates|selectattr("kind", "equalto", "line")|list %}
+      {% if named %}
+      <h3>Where they disagree</h3>
+      <table class="grid"><thead><tr><th>Line</th><th>Risk</th><th>Named in</th></tr></thead>
+        <tbody>{% for c in named %}{% for f in c.from if "pre-workshop" in f %}<tr><td>{{ c.id }}</td><td>{{ titles.get(c.id, "") }}</td><td>{{ f }}{% if f.startswith("1 ") %} only{% endif %}</td></tr>{% endfor %}{% endfor %}</tbody>
+      </table>
+      {% endif %}
+    {% endif %}
+
+  {% elif st.n == 3 %}
+    {% for p in swift %}{% set a = answers.get(p.id|string) %}
+    <div class="swift-prompt" id="prompt-{{ p.id }}">
+      <p><strong>{{ p.id }}.</strong> {{ p.prompt }} <small>{{ p.lines|join(", ") }}</small></p>
+      {% if a %}<p class="answer {{ 'covered' if a.status == 'covered' else 'unknown' }}">{{ a.status }}{% if a.control %}: {{ a.control }}{% endif %}{% if a.evidence %}; evidence {{ a.evidence }}{% endif %}{% if a.note %} ({{ a.note }}){% endif %}</p>{% endif %}
+      {% if editable and open and ws.stage >= 3 %}
+      <form method="post" action="/workshops/{{ ws_id }}/swift/{{ p.id }}" class="inline">
+        <label><input type="radio" name="status" value="covered"{% if a and a.status == "covered" %} checked{% endif %}> covered</label>
+        <label><input type="radio" name="status" value="not known"{% if a and a.status == "not known" %} checked{% endif %}> not known</label>
+        <label>Control <input name="control" value="{{ a.control if a and a.control else '' }}"></label>
+        <label>Evidence <input name="evidence" value="{{ a.evidence if a and a.evidence else '' }}"></label>
+        <label>Note <input name="note" value="{{ a.note if a and a.note else '' }}"></label>
+        <button type="submit">Record</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+  {% elif st.n == 4 %}
+    {% for r in ws.emerging_risks %}<p>E{{ loop.index }}. {{ r.title }}{% if r.note %}: {{ r.note }}{% endif %}</p>{% else %}<p class="empty">None recorded.</p>{% endfor %}
+    {% if editable and open and ws.stage >= 4 %}
+    <form method="post" action="/workshops/{{ ws_id }}/emerging" class="inline">
+      <label>Risk <input name="title" placeholder="An agent that books travel on its own"></label>
+      <label>Note <input name="note"></label>
+      <button type="submit">Add</button>
+    </form>
+    {% endif %}
+
+  {% elif st.n == 5 %}
+    <p>Candidates: register lines named in the lists, the lines of prompts answered "not known", and the emerging risks.{% if editable and open and ws.stage == 5 %} <a href="/workshops/{{ ws_id }}/participant">Participant entry for votes</a>{% endif %}</p>
+    {% if ranked %}
+    <table class="grid votes">
+      <thead><tr><th>Candidate</th><th>Risk</th><th>Participants who voted</th><th>Votes placed</th>{% for p in participants %}<th>{{ p }}</th>{% endfor %}</tr></thead>
+      <tbody>{% for e in ranked %}<tr><td>{{ e.id }}</td><td>{{ titles.get(e.id, "") }}</td><td>{{ e.voters }}</td><td>{{ e.votes }}</td>{% for p in participants %}<td>{{ e.by_participant.get(p, "") }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    </table>
+    <p><small>Ranked by how many participants voted for a risk, then by votes placed, so a single heavy vote does not decide the order (chapter 6). Each participant's votes are kept.</small></p>
+    {% else %}<p class="empty">No votes yet.</p>{% endif %}
+    {% if diffs %}
+    <h3>Where seats voted differently from the business owner</h3>
+    <table class="grid"><thead><tr><th>Seat</th><th>Person</th><th>Candidate</th><th>Their votes</th><th>Owner's votes</th></tr></thead>
+      <tbody>{% for d in diffs %}<tr><td>{{ d.seat }}</td><td>{{ d.person }}</td><td>{{ d.candidate }}</td><td>{{ d.votes }}</td><td>{{ d.owner_votes }}</td></tr>{% endfor %}</tbody>
+    </table>
+    <p><small>These go to the disagreement log (chapter 8).</small></p>
+    {% endif %}
+
+  {% elif st.n == 6 %}
+    {% if ws.gap_review %}<p>{{ ws.gap_review }}</p>{% endif %}
+    {% if editable and open and ws.stage == 6 %}
+    <form method="post" action="/workshops/{{ ws_id }}/gap" class="b1">
+      <label class="field"><span>Gap review against the taxonomy and the register</span><textarea name="gap_review" rows="3">{{ ws.gap_review or "" }}</textarea></label>
+      <button type="submit">Save notes</button>
+    </form>
+    {% endif %}
+    <h3>Taxonomy gap list</h3>
+    {% for r in ws.emerging_risks %}<p>E{{ loop.index }}. {{ r.title }}</p>{% else %}<p class="empty">Nothing outside the taxonomy.</p>{% endfor %}
+  {% endif %}
+</section>
+{% endfor %}

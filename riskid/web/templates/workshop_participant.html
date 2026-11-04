@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block heading %}Workshop {{ ws_id }}: participant entry{% endblock %}
+{% block content %}
+{% if reasons %}<div class="returned" role="alert"><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p>One person at a time, on this machine, or keyed in from a printed form. Nothing another participant entered is shown here.</p>
+<form method="get" action="/workshops/{{ ws_id }}/participant" class="inline picker">
+  <label>Your name
+    <select name="participant">{% for p in participants %}<option value="{{ p }}"{% if p == participant %} selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+  </label>
+  <button type="submit">Continue</button>
+</form>
+{% if not participants %}<p class="empty">No seats are filled for this workshop.</p>{% endif %}
+{% if participant and ws.status == "open" %}
+  {% if ws.stage == 1 %}
+  <form method="post" action="/workshops/{{ ws_id }}/participant" class="b1">
+    <input type="hidden" name="participant" value="{{ participant }}">
+    <label class="field"><span>Your top ten AI risks for this system, one per line</span>
+      <textarea name="pre_list" rows="10" placeholder="MOD-05 the vendor changes the model without telling us"></textarea>
+      <small>Write it before you see the straw man or anyone else's list. A register ID such as MOD-05 links the risk to its line.{% if submitted %} Your list has been received; sending again replaces it.{% endif %}</small>
+    </label>
+    <button type="submit">Send my list</button>
+  </form>
+  {% elif ws.stage == 5 %}
+  <form method="post" action="/workshops/{{ ws_id }}/participant" class="b1">
+    <input type="hidden" name="participant" value="{{ participant }}">
+    <input type="hidden" name="kind" value="votes">
+    <p>Place up to {{ ws.vote_allowance }} votes on the risks you think matter most. More than one vote may go on a single risk.</p>
+    <table class="grid">
+      {% for c in candidates %}<tr><td>{{ c.id }}</td><td>{{ titles.get(c.id, "") }}<br><small>{{ c.from|join("; ") }}</small></td><td><input type="text" name="vote_{{ c.id }}" inputmode="numeric" size="3"></td></tr>{% else %}<tr><td class="empty">No candidates.</td></tr>{% endfor %}
+    </table>
+    <button type="submit">Send my votes</button>
+  </form>
+  {% else %}
+  <p class="empty">Nothing to enter at stage {{ ws.stage }}. Lists are written at stage 1 and votes placed at stage 5.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

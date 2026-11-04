@@ -238,6 +238,9 @@ class Workshop(Model):
     votes: dict = dfield(default_factory=dict)       # per participant, per candidate
     gap_review: str = None
     record: str = None
+    stage: int = 1                     # the B.5 stage the workshop has reached, 1 to 6
+    status: str = "open"               # open | closed
+    vote_allowance: int = 5            # votes per participant (chapter 6: five to ten)
 
 
 # --- Interaction / Bow-tie --------------------------------------------------

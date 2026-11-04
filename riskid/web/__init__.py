@@ -84,6 +84,7 @@ def install(app, allowed_hosts) -> None:
     from riskid.web.routes_inventory import router as inventory
     from riskid.web.routes_library import router as library
     from riskid.web.routes_usecases import router as usecases
+    from riskid.web.routes_workshop import router as workshop
 
     app.add_middleware(SameOriginWrites)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(allowed_hosts))
@@ -91,3 +92,4 @@ def install(app, allowed_hosts) -> None:
     app.include_router(inventory)
     app.include_router(library)
     app.include_router(usecases)
+    app.include_router(workshop)

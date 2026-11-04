@@ -25,3 +25,11 @@ One line each (`PLAN.md` rule 11).
   seed the controls table of the Assess round.
 - round 6: the use-case form has four control rows; an HTMX "add a row"
   would allow more.
+- round 7: chapter 6's assumption register (one of its five outputs) has no
+  entity or screen yet.
+- round 7: the Delphi rounds for emerging and frontier risks (SPEC.md
+  section 2) are not built; the emerging risks are listed for them.
+- round 7: B.5's quarterly session keeps stages 1, 2, 3 (change prompts
+  only), 5 and 6; the workshop does not yet distinguish a quarterly session.
+- round 7: a workshop on several systems puts its top-down lines on the
+  first system, because a register line has one `system_id`.

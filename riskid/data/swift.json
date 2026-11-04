@@ -1,0 +1,176 @@
+{
+  "source": "Appendix B, B.4 SWIFT Prompt Set for AI (docs/BOOK_TABLES.md)",
+  "note": "Prompts 1 to 14 are the set in Chapter 6. Prompts 15 to 23 are additions.",
+  "prompts": [
+    {
+      "id": 1,
+      "prompt": "What if the vendor changes the model behind the service and does not tell us?",
+      "lines": [
+        "MOD-05"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What has changed in our customers, products or data since the model was built?",
+      "lines": [
+        "DAT-05",
+        "MOD-06"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What if a user pastes personal or confidential data into the system, or into a public tool in its place?",
+      "lines": [
+        "LEG-05",
+        "LEG-03"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "What if the model is wrong and sounds certain?",
+      "lines": [
+        "MOD-01"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "What if a document, email or web page the model reads contains instructions?",
+      "lines": [
+        "SEC-02"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "What if the overseer stops overriding the model?",
+      "lines": [
+        "HUM-01"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Could the overseer override the model at all, and has anyone the time to?",
+      "lines": [
+        "HUM-07"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "What if the system is used for a purpose it was not built for?",
+      "lines": [
+        "HUM-03"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "What if a regulator, a court or a complainant asks for the log of one decision?",
+      "lines": [
+        "TRA-07"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "What if the supplier withdraws the product, is bought, or changes its terms?",
+      "lines": [
+        "OPS-02"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "What if the system works on average and badly for one group of people?",
+      "lines": [
+        "FAI-04"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "What if the people affected are not told, or cannot challenge the outcome?",
+      "lines": [
+        "TRA-02"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Could the system do more than its task needs if it acts on a wrong or planted instruction?",
+      "lines": [
+        "SEC-08",
+        "MOD-10"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "What are we assuming about the vendor's testing that we have not checked on our own data?",
+      "lines": [
+        "MOD-08"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "What if the cost per transaction doubles?",
+      "lines": [
+        "OPS-04"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "What if the system learns from its users in production?",
+      "lines": [
+        "OPS-06",
+        "FAI-06"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Could someone trick, jailbreak or instruct the system into acting against policy?",
+      "lines": [
+        "SEC-01",
+        "HUM-04"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Could someone use the technology to impersonate our staff or our customers?",
+      "lines": [
+        "SOC-02"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Could something in the supply chain, such as a model, library or plugin, be compromised?",
+      "lines": [
+        "SEC-09"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "What has changed since last year that could alter the classification, the law that applies or the persons affected?",
+      "lines": [
+        "LEG-07",
+        "LEG-09"
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "Where are the gaps between data science, security, legal and the business? Who owns the risk that sits between them?",
+      "lines": [
+        "TRA-05",
+        "SOC-02"
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Where are the gaps between the pilot and production?",
+      "lines": [
+        "OPS-08",
+        "MOD-09"
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "What if the service is down for a day, or staff can no longer do the task by hand?",
+      "lines": [
+        "OPS-03",
+        "HUM-06"
+      ]
+    }
+  ]
+}
