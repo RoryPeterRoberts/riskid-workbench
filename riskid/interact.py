@@ -44,12 +44,12 @@ def nodes(interactions: dict) -> tuple[list, list]:
 
 
 def candidate_links(register: dict, interactions: dict) -> list:
-    """Pairs of live lines that cite the same Annex A control and have not been judged.
+    """Ordered pairs of live lines that cite the same Annex A control, not yet judged.
 
     Chapter 10: lines that name the same control, data source or owner are the
     first candidates; the session confirms or strikes them.
     """
-    judged = {frozenset((link["from_line"], link["to_line"])) for link in interactions.values()}
+    judged = {(link["from_line"], link["to_line"]) for link in interactions.values()}  # ordered
     by_control: dict = {}
     for line_id, line in sorted(register.items()):
         if line.get("status") == "retired":
@@ -58,8 +58,7 @@ def candidate_links(register: dict, interactions: dict) -> list:
             by_control.setdefault(ref, []).append(line_id)
     out = []
     for ref, lines in sorted(by_control.items()):
-        pairs = [(a, b) for i, a in enumerate(lines) for b in lines[i + 1:]
-                 if frozenset((a, b)) not in judged]
+        pairs = [(a, b) for a in lines for b in lines if a != b and (a, b) not in judged]
         if pairs:
             out.append({"control": ref, "lines": lines, "pairs": pairs})
     return out

@@ -20,6 +20,7 @@
     <label>To <select name="to_line">{% for l in live %}<option value="{{ l }}">{{ l }}</option>{% endfor %}</select></label>
     <label>Mechanism <input name="mechanism" placeholder="degraded output reaches reviewers who stopped checking"></label>
     <label>After <input name="delay" size="8" placeholder="days"></label>
+    <label>Note <input name="note"></label>
     <button type="submit">Record</button>
   </form>
   {% set judged = cells.values()|selectattr("kind", "in", letter.keys()|list)|list %}
@@ -38,7 +39,7 @@
 <section class="stage" id="candidates">
   <h2>Candidate links</h2>
   <p class="record">Lines that name the same control are the first candidates; the session confirms or strikes them.</p>
-  {% for c in candidates %}<p><strong>{{ c.control }}</strong>: {{ c.lines|join(", ") }} <small>({{ c.pairs|length }} {{ "pair" if c.pairs|length == 1 else "pairs" }} not yet judged)</small></p>{% else %}<p class="empty">No unjudged lines share a control.</p>{% endfor %}
+  {% for c in candidates %}<p><strong>{{ c.control }}</strong>: {{ c.lines|join(", ") }} <small>(not yet judged: {% for a, b in c.pairs %}{{ a }} → {{ b }}{% if not loop.last %}, {% endif %}{% endfor %})</small></p>{% else %}<p class="empty">No unjudged lines share a control.</p>{% endfor %}
 </section>
 
 <section class="stage" id="bowties">

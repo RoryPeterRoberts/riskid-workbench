@@ -69,7 +69,7 @@ def test_a_cell_is_changed_or_cleared_without_deleting(org):
     client.post("/interact/links", data=LINK)
     client.post("/interact/links", data=dict(LINK, kind="triggers"))
     assert _state(path)["interaction"]["MOD-05>HUM-01"]["kind"] == "triggers"
-    client.post("/interact/links", data=dict(LINK, kind="none", mechanism="no mechanism found"))
+    client.post("/interact/links", data=dict(LINK, kind="none", mechanism=""))   # none needs no mechanism
     text = client.get("/interact").text
     # Neither line is material and no live link is left, so the pair leaves the matrix.
     assert 'data-pair="MOD-05>HUM-01"' not in text
@@ -138,7 +138,10 @@ def test_candidate_links_from_a_shared_control(org):
     assert "A.9.3" in candidates and "HUM-01" in candidates and "TRA-02" in candidates
     client.post("/interact/links", data=dict(LINK, from_line="HUM-01", to_line="TRA-02", kind="triggers"))
     candidates = client.get("/interact").text.split('id="candidates"')[1].split("</section>")[0]
-    assert "A.9.3" not in candidates                            # judged, so no longer a candidate
+    assert "TRA-02 → HUM-01" in candidates and "HUM-01 → TRA-02" not in candidates  # not symmetric
+    client.post("/interact/links", data={"from_line": "TRA-02", "to_line": "HUM-01", "kind": "none"})
+    candidates = client.get("/interact").text.split('id="candidates"')[1].split("</section>")[0]
+    assert "A.9.3" not in candidates                            # both directions judged
 
 
 def test_interact_renders_for_an_empty_organisation(tmp_path):

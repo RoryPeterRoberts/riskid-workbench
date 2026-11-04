@@ -121,6 +121,6 @@ def escalates(assessment: dict) -> bool:
 def latest_assessments(state: dict) -> dict:
     """The current (latest) assessment of each line: ``{line_id: (as_id, assessment)}``."""
     latest: dict = {}
-    for as_id, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0][3:])):
+    for as_id, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0].rsplit("-", 1)[-1])):
         latest[a["line_id"]] = (as_id, a)
     return latest

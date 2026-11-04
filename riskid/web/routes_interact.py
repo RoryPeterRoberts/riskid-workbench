@@ -65,14 +65,14 @@ async def link_record(request: Request, store: Store = Depends(get_store)):
     if a not in live or b not in live:
         reasons.append("Link: both lines must be live lines in the register.")
     elif a == b:
-        reasons.append("Link: a line does not trigger or amplify itself.")
+        reasons.append("Link: a line does not trigger, amplify or share a driver with itself.")
     if form.get("kind") not in KINDS:
         reasons.append("Link: triggers, amplifies, shared driver, or none.")
-    if not form.get("mechanism"):
+    if form.get("kind") in LETTER and not form.get("mechanism"):
         reasons.append("Link: state the mechanism; a cell with no mechanism stays blank (chapter 10).")
     if reasons:
         return _page(request, store, reasons, 422)
-    link = Interaction(from_line=a, to_line=b, kind=form["kind"], mechanism=form["mechanism"],
+    link = Interaction(from_line=a, to_line=b, kind=form["kind"], mechanism=form.get("mechanism") or None,
                        delay=form.get("delay") or None, note=form.get("note") or None)
     store.append(Event(entity="interaction", entity_id=f"{a}>{b}", new=link.to_dict(),
                        actor=request.app.state.actor, reason=f"{a} {form['kind']} {b}"))
@@ -108,9 +108,10 @@ async def _save_bowtie(request, store, bt_id=None):
     bowtie, reasons = _parse_bowtie(form, _live(store.state()))
     if reasons:
         return _page(request, store, reasons, 422, form)
+    action = "updated" if bt_id else "created"
     bt_id = bt_id or store.next_id("bowtie", "BT")
     store.append(Event(entity="bowtie", entity_id=bt_id, new=bowtie.to_dict(),
-                       actor=request.app.state.actor, reason=f"bow-tie for {bowtie.line_id}"))
+                       actor=request.app.state.actor, reason=f"bow-tie {action} for {bowtie.line_id}"))
     return RedirectResponse(f"/interact/bowties/{bt_id}", status_code=303)
 
 
