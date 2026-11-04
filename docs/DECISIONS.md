@@ -303,3 +303,43 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
   whenever it was logged, not only those since the last run: B.8 asks that
   every trigger since last quarter was processed, and one from an earlier
   quarter that is still undecided was not processed either. 2026-11-04.
+- round 14: Contracts keep one record per system (entity `contract`, keyed by
+  the system's ID), generated clause list `contracts.json` from B.9. A clause
+  is a gap when it is not recorded present and one of its lines is live on the
+  system ("Any line": any live line). A system needs a contract when it is
+  bought, or built on a model provider's model. "The share of AI contracts
+  that meet the clause standard" (chapter 12) counts recorded contracts with
+  no gap. 2026-11-04.
+- round 14: people are entities (P-nnn). The person recording is chosen in
+  Settings for this run of the workbench and is not itself an event, since
+  every change records its actor. The organisation form keeps a field it did
+  not send and clears one sent empty. 2026-11-04.
+- round 14: the assistant's settings are an event in the organisation file, so
+  the trail shows who switched it on and when. Its API key is read from an
+  environment variable whose name must start `RISKID_`, so a file shared by
+  someone else cannot have another secret sent, and the endpoint is shown
+  beside the draft button. 2026-11-04.
+- round 14: the adapter speaks the OpenAI chat API through `urllib` (no new
+  dependency) and asks for JSON against the kind's schema, checked by a small
+  schema check before anything is shown. For a local server it sends reasoning
+  effort medium and, when the first answer is cut with no content, asks once
+  more without thinking (SPEC.md section 8). Each request is an `ai_request`
+  event (AIR-nnn) with the model, version, tokens, the names of the fields sent
+  and the outcome, in the name of the person who asked; the drafted record's
+  event carries `ai_draft` (model, version). The request runs in a worker
+  thread, so the workbench answers other pages meanwhile. 2026-11-04.
+- round 14: a drafted use case has status `draft` and `ai_draft` (model,
+  version, date, the fields drafted), and counts as Very Low through
+  `rules.ai_draft_quality` until a person submits it; submitting is the
+  acceptance, recorded as `accepted_by` and `accepted_date`, and the
+  submission is checked like any other. The draft names no owner and no data
+  quality rating, which the assistant may not set. A discarded draft keeps its
+  record with status `discarded`. 2026-11-04.
+- round 14: the quarterly pack adds the signed checklist as PDF, so the pack
+  opens in Excel, a PDF reader and a browser (SPEC.md section 11). 2026-11-04.
+- round 14: packaging: version 1.0.0; `tests/shell/pipx_install.sh` installs
+  with pipx into a throwaway home, serves, and fetches a PDF (run with
+  `RISKID_SHELL_TESTS=1`); `packaging/riskid.spec` builds the single file,
+  built and checked on Linux in a throwaway environment. PyInstaller is a
+  build tool named in SPEC.md section 9, not a dependency of the package.
+  The `v1.0.0` tag waits for the merge. 2026-11-04.

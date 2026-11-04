@@ -141,6 +141,17 @@ def test_an_answer_that_does_not_fit_the_schema_is_refused(org, stub):
     assert "usecase" not in _state(path) and "did not fit" in _state(path)["ai_request"]["AIR-001"]["outcome"]
 
 
+def test_a_taxonomy_answered_with_its_name_is_read_as_its_code(org, stub):
+    client, path = org
+    _switch_on(client, stub.endpoint)
+    stub.answers.append(Stub.answer(json.dumps(dict(DRAFT, taxonomy="2.3 - Drift and degradation",
+                                                    controls=[{"name": "not stated", "type": "preventive",
+                                                               "evidence": "not stated"}]))))
+    client.post("/usecases/draft", data={"system_id": "SYS-002"})
+    fields = _state(path)["usecase"]["UC-001"]["fields_"]
+    assert fields["taxonomy"] == "2.3" and fields["controls"] == []     # an unnamed control is dropped
+
+
 def test_a_cut_generation_is_asked_again_without_thinking(org, stub):
     client, path = org
     _switch_on(client, stub.endpoint)

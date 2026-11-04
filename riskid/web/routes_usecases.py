@@ -16,6 +16,7 @@ person is recorded in ``ai_draft`` and the submission is checked as any other.
 
 from __future__ import annotations
 
+import re
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -153,7 +154,10 @@ def _draft_values(draft: dict, headers: dict) -> dict:
     values.update({k: draft.get(k) or "" for k in ("risk_id", "taxonomy", "definition", "drivers_direct",
                                                     "drivers_indirect", "metrics", "qualitative",
                                                     "indicators", "data_quality_basis")})
-    for i, control in enumerate(draft.get("controls") or [], start=1):
+    code = re.search(r"[0-9]+\.[0-9]+", values["taxonomy"])      # "2.1 - Accuracy..." gives 2.1
+    values["taxonomy"] = code.group() if code else values["taxonomy"]
+    named = [c for c in draft.get("controls") or [] if (c.get("name") or "").strip().lower() not in ("", "not stated")]
+    for i, control in enumerate(named, start=1):
         values.update({f"control_{i}_{k}": control.get(k) or "" for k in ("name", "type", "evidence")})
     return values
 
@@ -166,8 +170,11 @@ async def usecase_draft(request: Request, store: Store = Depends(get_store)):
     if not adapter.is_on(settings):
         raise HTTPException(409, "The assistant is off; Settings switches it on.")
     headers = header_defaults(system)
-    # Only what the new-use-case screen shows: the header lines and the taxonomy codes to choose from.
+    # Only what the new-use-case screen shows: the header lines, B.2's guidance for each field the
+    # assistant may draft, and the taxonomy codes to choose from.
     sent = {"header_lines": headers,
+            "fields_to_draft": {name: f"{label}: {what}" for _, name, label, what, _ in FIELDS
+                                if name not in ("risk_id", "owner", "data_quality")},
             "taxonomy": {t["l2_code"]: t["l2"] for t in store.taxonomy()}}
     actor = request.app.state.actor
     try:

@@ -173,7 +173,7 @@ MODULES = {
         path="/settings",
         chapter=14,
         chapter_title="Technology: Monitoring, Evaluation Harnesses, Red Teams and Using AI to Find AI Risk",
-        template="The organisation, its people, the assistant, the data packs and the file",
+        template="The six rules for an AI assistant (chapter 14)",
         why=("Text drafted or summarised by a model that nobody has checked is Very Low evidence in the data "
              "quality rating."),
         case=("The Test That Ran for Years: in June 2024 McDonald's ended its test with IBM of an AI system "

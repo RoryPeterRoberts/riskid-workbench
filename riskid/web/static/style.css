@@ -191,3 +191,8 @@ section.step .why-list { margin-bottom: 0.5rem; }
 :root { --draft: #E8F0FB; --draft-edge: #3A6EA5; }
 .draft { background: var(--draft); border-left: 4px solid var(--draft-edge); padding: 0.5rem 1rem; margin-bottom: 1rem; }
 form.b1.drafted .b1-row { background: var(--draft); }
+/* The B.2 fields themselves: full-width boxes, so a drafted field can be read and checked */
+form.b1 .b1-row > textarea, form.b1 .b1-row > input[type=text], form.b1 .b1-row > select {
+  display: block; width: 100%; max-width: 48rem; font: inherit; padding: 0.35rem 0.5rem;
+  border: 1px solid #B9B3A0; border-radius: 3px; background: #fff; margin: 0.35rem 0; }
+form.b1 .b1-row > textarea { min-height: 4.5rem; }
