@@ -128,7 +128,20 @@ MODULES = {
               "than 900 sub-postmasters on evidence from faulty software, and they had no practical "
               "way to examine the system's own records."),
     ),
+    "documents": Module(
+        key="documents",
+        title="Documents",
+        path="/documents",
+        chapter=12,
+        chapter_title="Integration: Impact Assessments, the Statement of Applicability, Monitoring and the Board",
+        template="B.7 Fundamental Rights Impact Assessment Mapping",
+        why=("It makes the people who decide answer the questions in writing before the system "
+             "goes live."),
+        case=("Rite Aid and Facial Recognition: in December 2023 the US Federal Trade Commission "
+              "banned Rite Aid from using facial-recognition surveillance in its stores for five "
+              "years after false matches that fell disproportionately on women and people of colour."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact", "register"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess", "interact", "register", "documents"))

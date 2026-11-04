@@ -1,0 +1,10 @@
+{% extends "doc_base.html" %}
+{% block title %}Statement of Applicability{% endblock %}
+{% block body %}
+<h1>Statement of Applicability</h1>
+<p>ISO/IEC 42001 clause 6.1.3(f): the Annex A controls the live register lines cite, with the lines as the justification. A control cited by a material line is included. A control cited by no line is a candidate for exclusion, with the reason written down.</p>
+<table>
+  <thead><tr><th>Annex A control</th><th>Register lines that cite it</th><th>Inclusion and justification</th></tr></thead>
+  <tbody>{% for ref, lines, why in table %}<tr><td>{{ ref }}</td><td>{{ lines|join(", ") }}</td><td>{{ why }}</td></tr>{% else %}<tr><td colspan="3">No Annex A references on live lines.</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

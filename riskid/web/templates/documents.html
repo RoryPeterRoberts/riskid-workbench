@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Every document is built from the register as it stands now and records what it was built from: data packs {{ prov.pack_versions }}; register state hash <code>{{ prov.state_hash[:16] }}…</code>.</p>
+<table class="grid">
+  <thead><tr><th>Document</th><th>What it holds</th><th>Download</th></tr></thead>
+  <tbody>
+    <tr><td>Register</td><td>The live lines in the book's register columns</td><td><a href="/documents/register.xlsx">XLSX</a> · <a href="/documents/register.csv">CSV</a> · <a href="/documents/register.pdf">PDF</a> · <a href="/documents/register.html">view</a></td></tr>
+    <tr><td>Heat maps</td><td>Inherent and residual, as the reference script draws them</td><td><a href="/assess/heatmap/inherent.png">inherent PNG</a> · <a href="/assess/heatmap/residual.png">residual PNG</a></td></tr>
+    <tr><td>Statement of Applicability</td><td>The Annex A controls the live lines cite, with the lines as justification</td><td><a href="/documents/soa.xlsx">XLSX</a> · <a href="/documents/soa.pdf">PDF</a> · <a href="/documents/soa.html">view</a></td></tr>
+    <tr><td>Principal AI Risk Report</td><td>Chapter 12's twelve items on one page for the board</td><td><a href="/documents/report.pdf">PDF</a> · <a href="/documents/report.html">view</a></td></tr>
+    {% for s in systems %}<tr><td>FRIA {{ s.id }}</td><td>Article 27(1) for {{ s.name }}, assembled per B.7</td><td><a href="/documents/fria/{{ s.id }}.docx">DOCX</a> · <a href="/documents/fria/{{ s.id }}.pdf">PDF</a> · <a href="/documents/fria/{{ s.id }}.html">view</a></td></tr>{% endfor %}
+  </tbody>
+</table>
+<h2>Documents generated</h2>
+{% if recorded %}
+<table class="grid"><thead><tr><th>ID</th><th>Kind</th><th>Generated (UTC)</th><th>File</th><th>Register state hash</th></tr></thead>
+  <tbody>{% for doc_id, d in recorded %}<tr><td>{{ doc_id }}</td><td>{{ d.kind }}</td><td>{{ d.generated_at }}</td><td>{{ d.file_path }}</td><td><code>{{ d.inputs_hash[:16] }}…</code></td></tr>{% endfor %}</tbody>
+</table>
+{% else %}<p class="empty">None yet.</p>{% endif %}
+{% endblock %}

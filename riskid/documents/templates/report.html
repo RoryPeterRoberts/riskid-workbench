@@ -1,0 +1,10 @@
+{% extends "doc_base.html" %}
+{% block title %}Principal AI Risk Report{% endblock %}
+{% block body %}
+<h1>Principal AI Risk Report</h1>
+<p>What the organisation's AI exposure is, whether it is inside what the board has accepted, and what the board is asked to decide (chapter 12). Each item names its source in the register.</p>
+<table>
+  <thead><tr><th>Item</th><th>What the board sees</th><th>Source</th></tr></thead>
+  <tbody>{% for n, item, statements, source in items %}<tr><td>{{ n }}. {{ item }}</td><td><ul>{% for s in statements %}<li>{{ s }}</li>{% endfor %}</ul></td><td class="source">{{ source }}</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

@@ -61,3 +61,7 @@ One line each (`PLAN.md` rule 11).
   outside the system's team before it takes effect is not enforced.
 - round 11: `riskid/store.py` is at the 400-line limit; the next store change
   should first move `init` and `rebuild` to their own module.
+- round 12: the SoA's exclusions need the 38 Annex A controls as a data pack
+  (references and short titles); today it lists the cited ones.
+- round 12: the PDF line profile and the workshop record PDF of SPEC.md
+  section 7 are not built; both have HTML pages.

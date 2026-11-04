@@ -1,0 +1,11 @@
+{% extends "doc_base.html" %}
+{% block title %}FRIA {{ system.id }}{% endblock %}
+{% block body %}
+<h1>Fundamental rights impact assessment: {{ system.id }} {{ system.name }}</h1>
+<p>Article 27(1) of the AI Act, assembled from the register as mapped in Appendix B.7. The duty falls on deployers that are public bodies, private entities providing public services, and deployers of the systems in Annex III, points 5(b) and (c). It applies to the first use of a system and is repeated where an element changes (Article 27(2)).</p>
+{% for element, heading, source, statements in elements %}
+<h2>{{ element }} {{ heading }}</h2>
+<ul>{% for s in statements %}<li>{{ s }}</li>{% endfor %}</ul>
+<p class="source">Source: {{ source }}</p>
+{% endfor %}
+{% endblock %}
