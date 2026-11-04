@@ -116,3 +116,11 @@ def parse_assessment(form, line_id: str, controls: list, flags: dict, system: di
 def escalates(assessment: dict) -> bool:
     """Chapter 9: a speed of 5 or a vulnerability of 5 puts a line in front of the owner this week."""
     return assessment.get("speed") == 5 or assessment.get("vulnerability") == 5
+
+
+def latest_assessments(state: dict) -> dict:
+    """The current (latest) assessment of each line: ``{line_id: (as_id, assessment)}``."""
+    latest: dict = {}
+    for as_id, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0].rsplit("-", 1)[-1])):
+        latest[a["line_id"]] = (as_id, a)
+    return latest

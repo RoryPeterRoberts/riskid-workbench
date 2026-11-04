@@ -15,9 +15,9 @@ team sharing a file. Version 1 covers phases 1 to 6 of the method, the
 integration outputs, the cycle and the contract checklist, and deliberately leaves
 out multi-user concurrency, cloud hosting, and any automated scoring.
 
-Status: **in build.** Rounds 0 to 9 of `docs/PLAN.md` are done: the data packs,
+Status: **in build.** Rounds 0 to 10 of `docs/PLAN.md` are done: the data packs,
 the rules, the store and its audit trail, and the Inventory, Library, Use
-cases, Workshop, Reconcile and Assess screens with the heat maps. To try it:
+cases, Workshop, Reconcile, Assess (with the heat maps) and Interact screens. To try it:
 `pip install -e .`, then `riskid init my.riskid` and `riskid serve my.riskid`.
 Read `docs/SPEC.md` (what it is), `docs/PLAN.md` (how it is built, round by
 round) and `docs/RiskID_Workbench_Brochure.pdf` (for the Risk Manager).

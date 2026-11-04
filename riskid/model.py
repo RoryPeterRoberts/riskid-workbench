@@ -284,8 +284,10 @@ class Reconciliation(Model):
 class Interaction(Model):
     from_line: str = None
     to_line: str = None
-    kind: str = None                    # triggers | amplifies | shared driver
+    kind: str = None                    # triggers | amplifies | shared driver | none
     note: str = None
+    mechanism: str = None               # chapter 10: a cell with no mechanism stays blank
+    delay: str = None
 
 
 @dataclass
@@ -296,6 +298,8 @@ class BowTie(Model):
     event: str = None
     recovery_controls: list = dfield(default_factory=list)
     consequences: list = dfield(default_factory=list)
+    owner: str = None                   # chapter 10: one owner, the head of the process
+    escalation_factors: list = dfield(default_factory=list)
 
 
 # --- Trigger / Cycle / Contract --------------------------------------------

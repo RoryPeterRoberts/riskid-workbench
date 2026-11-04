@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse, Response
 
 from riskid import importers, rules
-from riskid.assess import DATA_QUALITY, SCALES, escalates, parse_assessment
+from riskid.assess import DATA_QUALITY, SCALES, escalates, latest_assessments, parse_assessment
 from riskid.documents.heatmap import placements, render
 from riskid.model import Control, Disagreement, Event
 from riskid.reconcile import DIMENSIONS, library_lines
@@ -36,14 +36,6 @@ def _line(store: Store, line_id: str) -> dict:
 def _controls(store: Store, line_id: str) -> list:
     return [dict(c, id=ct_id) for ct_id, c in sorted(store.state().get("control", {}).items())
             if c.get("line_id") == line_id]
-
-
-def latest_assessments(state: dict) -> dict:
-    """The current (latest) assessment of each line: ``{line_id: (as_id, assessment)}``."""
-    latest: dict = {}
-    for as_id, a in sorted(state.get("assessment", {}).items(), key=lambda kv: int(kv[0][3:])):
-        latest[a["line_id"]] = (as_id, a)
-    return latest
 
 
 def _rows(state: dict) -> list:

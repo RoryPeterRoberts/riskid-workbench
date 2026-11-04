@@ -1,0 +1,16 @@
+{# The bow-tie editor: causes and preventive controls on the left, recovery controls and consequences on the right. #}
+<form method="post" action="{{ action }}" class="b1">
+  <label class="field"><span>Line at the centre</span><select name="line_id">{% for l in live %}<option value="{{ l }}"{% if values.get('line_id') == l %} selected{% endif %}>{{ l }} {{ titles.get(l, "") }}</option>{% endfor %}</select></label>
+  <label class="field"><span>The event</span><input name="event" value="{{ values.get('event') or '' }}" placeholder="Wrong decisions about individuals are issued at volume and stay uncorrected"></label>
+  <label class="field"><span>Owner: the head of the process the system sits in</span><input name="owner" value="{{ values.get('owner') or '' }}"></label>
+  <div class="bowtie-edit">
+    <div><h4>Causes and preventive controls</h4>
+      {% for i in rows %}<div class="pair"><input name="cause_{{ i }}" placeholder="Cause {{ i }}" value="{{ values.get('cause_%d' % i) or '' }}"><input name="preventive_{{ i }}" placeholder="Preventive controls" value="{{ values.get('preventive_%d' % i) or '' }}"></div>{% endfor %}
+    </div>
+    <div><h4>Recovery controls and consequences</h4>
+      {% for i in rows %}<div class="pair"><input name="recovery_{{ i }}" placeholder="Recovery controls" value="{{ values.get('recovery_%d' % i) or '' }}"><input name="consequence_{{ i }}" placeholder="Consequence {{ i }}" value="{{ values.get('consequence_%d' % i) or '' }}"></div>{% endfor %}
+    </div>
+  </div>
+  <label class="field"><span>Escalation factors: how the barriers fail, one per line</span><textarea name="escalation_factors" rows="2">{{ values.get('escalation_factors') or '' }}</textarea></label>
+  <p class="actions"><button type="submit">{{ button }}</button></p>
+</form>

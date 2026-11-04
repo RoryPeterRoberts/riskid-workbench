@@ -30,6 +30,7 @@ LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
 _SAFE_METHODS = ("GET", "HEAD", "OPTIONS")
 
 templates = Jinja2Templates(directory=WEB_DIR / "templates")
+templates.env.globals["zip"] = zip
 
 
 async def get_store(request: Request):
@@ -87,6 +88,7 @@ def install(app, allowed_hosts) -> None:
     from riskid.web.routes_workshop import router as workshop
     from riskid.web.routes_reconcile import router as reconcile
     from riskid.web.routes_assess import router as assess
+    from riskid.web.routes_interact import router as interact
 
     app.add_middleware(SameOriginWrites)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(allowed_hosts))
@@ -97,3 +99,4 @@ def install(app, allowed_hosts) -> None:
     app.include_router(workshop)
     app.include_router(reconcile)
     app.include_router(assess)
+    app.include_router(interact)
