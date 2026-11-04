@@ -35,6 +35,20 @@ MODULES = {
               "confidential source code into ChatGPT, a tool nobody had assessed "
               "(LEG-05, OPS-07)."),
     ),
+    "library": Module(
+        key="library",
+        title="Library",
+        path="/library",
+        chapter=4,
+        chapter_title="The AI Risk Taxonomy",
+        template="Appendix A register (91 lines) and the 42-line taxonomy",
+        why=("It is the starting universe for Phase 1 (Chapter 5): the straw man you cut "
+             "down for one system and add to."),
+        case=("SyRI and the Risk That Had No Name: in February 2020 the District Court of "
+              "The Hague held that the law behind a Dutch welfare-fraud system breached "
+              "Article 8 ECHR; its risks had not been set out in any form the court could "
+              "test (FAI-03)."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.

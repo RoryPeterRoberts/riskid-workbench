@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="get" action="/library/propose" class="inline picker">
+  <label>Propose lines for a system
+    <select name="system">
+      {% for s in systems %}<option value="{{ s.id }}">{{ s.id }} {{ s.name }}</option>{% endfor %}
+    </select>
+  </label>
+  {% if systems %}<button type="submit">Propose</button>{% else %}<span class="empty">Add a system to the <a href="/inventory/new">Inventory</a> first.</span>{% endif %}
+</form>
+
+<form method="get" action="/library" class="inline">
+  <label>Search <input name="q" value="{{ q }}" placeholder="words in the title, description, controls or law"></label>
+  <label>Category
+    <select name="l1">
+      <option value="">All nine</option>
+      {% for code, name in l1_names.items() %}<option value="{{ code }}"{% if code == l1 %} selected{% endif %}>{{ code }} {{ name }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit">Filter</button>
+</form>
+
+<h2>Register lines ({{ lines|length }})</h2>
+{% if lines %}
+<table class="grid">
+  <thead><tr><th>ID</th><th>Risk</th><th>Category</th><th>Role</th><th>Lifecycle</th><th>Law</th></tr></thead>
+  <tbody>
+  {% for line in lines %}
+    <tr>
+      <td class="line-id"><a href="/library/{{ line.id }}">{{ line.id }}</a></td>
+      <td>{{ line.title }}</td>
+      <td>{{ l1_names.get(line.l1, line.l1) }}<br><small>{{ line.l2 }}</small></td>
+      <td>{{ line.role }}</td>
+      <td><small>{{ line.lifecycle }}</small></td>
+      <td><small>{{ line.reg }}</small></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No line matches.</p>
+{% endif %}
+
+<h2 id="taxonomy">Taxonomy (42 sub-categories)</h2>
+<table class="grid">
+  <thead><tr><th>Code</th><th>Category</th><th>Sub-category</th><th>Owner function</th></tr></thead>
+  <tbody>
+  {% for t in taxonomy %}
+    <tr><td class="tax-code">{{ t.l2_code }}</td><td>{{ t.l1_code }} {{ t.l1 }}</td><td>{{ t.l2 }}</td><td>{{ t.owner_function }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

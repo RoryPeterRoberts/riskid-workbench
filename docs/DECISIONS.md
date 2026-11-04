@@ -80,3 +80,27 @@ dependency added outside `PLAN.md` section 2 needs a line here (rule 10 of
 - round 4: the timestamp helpers moved from `riskid/store.py` to
   `riskid/timestamps.py`, unchanged, because the round 3 fix took store.py to
   408 lines, over rule 5's limit of 400. 2026-11-03.
+- round 5: `riskid/propose.py` sorts the library for a system into proposed and
+  removed lines, each with its reasons (chapter 5: filter by role, lifecycle
+  stage, persons affected and classification; record the reason for every
+  line removed). A provider's line is removed for a pure deployer and a
+  deployer's for a pure provider. A line is proposed when its stages include
+  the system's stage, or when it cites an article the system engages: the
+  Act's Articles 4 and 6 for any classified system; Article 5 if prohibited;
+  Articles 9 to 17, 43, 47 to 49, 72 and 73 for a provider of a high-risk
+  system and 13, 14, 26, 27, 73 and 86 for its deployer; 6 and 49 for the
+  Article 6(3) exception; 25 when the system is bought and configured or the
+  role is both; 13, 25 and 53 when it is bought; 50 when an Article 50 duty
+  is recorded; the GDPR when personal data is recorded. An unrecorded role,
+  stage or list of persons removes nothing: unknown is not none. 2026-11-04.
+- round 5: a register ID is used once in an organisation, so adopting a
+  library line already in the register is refused, whichever system it was
+  adopted for (SPEC.md section 4: one `system_id` per register line).
+  2026-11-04.
+- round 5: an adopted line is a candidate with `source` library and `trend`
+  new; its owner stays empty because B.3 asks for a named person and the
+  library holds a role; its Annex A references are read from the line's
+  controls text (81 of the 91 lines cite one). 2026-11-04.
+- round 5: a line the filter removed can still be adopted ("Adopt anyway");
+  the event's reason then records the filter's reason it overrode.
+  2026-11-04.
