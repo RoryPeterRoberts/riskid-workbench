@@ -4,7 +4,9 @@ Each of the 17 clauses names the register lines it answers. A clause is a gap
 for a system when it is not recorded as present and one of its lines is live on
 that system; for "Any line" (clause 5), when the system has any live line.
 Chapter 12: "the register gives procurement a measure to report: the share of AI
-contracts that meet the clause standard"; here, a recorded contract with no gap.
+contracts that meet the clause standard"; here, a recorded contract with no gap
+on a system with at least one live line. A system with none has nothing yet to
+judge its contract by, so it is not counted as meeting the standard.
 """
 
 from __future__ import annotations
@@ -35,4 +37,4 @@ def gaps(contract: dict | None, live: list, clauses: list) -> list:
 
 
 def meets_standard(contract: dict | None, live: list, clauses: list) -> bool:
-    return contract is not None and not gaps(contract, live, clauses)
+    return contract is not None and bool(live) and not gaps(contract, live, clauses)

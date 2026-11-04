@@ -124,11 +124,14 @@ def _backup(path: Path) -> bytes:
     with tempfile.TemporaryDirectory() as tmp:
         copy = Path(tmp) / "backup.riskid"
         # as_uri() escapes a space, # or ? in the path, which a bare file: URI would misread.
-        source, target = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True), sqlite3.connect(copy)
+        source = sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
         try:
-            source.backup(target)
+            target = sqlite3.connect(copy)
+            try:
+                source.backup(target)
+            finally:
+                target.close()
         finally:
-            target.close()
             source.close()
         return copy.read_bytes()
 

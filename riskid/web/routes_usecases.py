@@ -70,7 +70,7 @@ def _form_page(request, store, system, values, reasons, uc_id=None, status_code=
                   control_rows=range(1, CONTROL_ROWS + 1), control_examples=CONTROL_EXAMPLES)
 
 
-def _submit(request, store, system, values, uc_id=None, ai_draft=None):
+def _submit(request, store, system, values, uc_id=None, ai_draft=None, accepting=False):
     """Check a submission, record it, and on acceptance record its register line."""
     record, reasons = parse_usecase(values, _taxonomy(store), _known_lines(store))
     actor = request.app.state.actor
@@ -78,7 +78,7 @@ def _submit(request, store, system, values, uc_id=None, ai_draft=None):
     uc_id = uc_id or store.next_id("usecase", "UC")
     usecase = UseCase(system_id=system["id"], submitted_by=actor, date=date.today().isoformat(),
                       ai_draft=ai_draft or {}, **record)
-    reason = ("submitted" if new_record else "draft accepted and submitted" if ai_draft
+    reason = ("submitted" if new_record else "draft accepted and submitted" if accepting
               else "resubmitted after return")
     if reasons:
         # One reason per line: a reason may itself contain a semicolon.
@@ -243,6 +243,8 @@ async def usecase_resubmit(uc_id: str, request: Request, store: Store = Depends(
                                  "is submitted again.")
     values = await _submitted(request)
     ai_draft = usecase.get("ai_draft") or None
-    if ai_draft and not ai_draft.get("accepted_by"):
-        ai_draft = dict(ai_draft, accepted_by=request.app.state.actor, accepted_date=date.today().isoformat())
-    return _submit(request, store, _system(store, usecase["system_id"]), values, uc_id=uc_id, ai_draft=ai_draft)
+    accepting = usecase["status"] == "draft"
+    if accepting:
+        ai_draft = dict(ai_draft or {}, accepted_by=request.app.state.actor, accepted_date=date.today().isoformat())
+    return _submit(request, store, _system(store, usecase["system_id"]), values, uc_id=uc_id, ai_draft=ai_draft,
+                   accepting=accepting)

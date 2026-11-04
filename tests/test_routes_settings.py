@@ -86,6 +86,27 @@ def test_the_backup_is_a_copy_of_the_file_and_is_recorded(org, tmp_path):
         assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
 
 
+def test_a_backup_that_cannot_write_its_copy_still_closes_the_file(org, monkeypatch):
+    client, _ = org
+    from riskid.web import routes_settings
+    opened, real_connect = [], sqlite3.connect
+
+    def connect(target, *args, **kwargs):
+        if str(target).endswith("backup.riskid"):
+            raise sqlite3.OperationalError("disk full")
+        if not kwargs.get("uri"):
+            return real_connect(target, *args, **kwargs)
+        # The backup's read-only source, usable from this thread so the test can see whether it closed.
+        opened.append(real_connect(target, *args, check_same_thread=False, **kwargs))
+        return opened[-1]
+
+    monkeypatch.setattr(routes_settings.sqlite3, "connect", connect)
+    with pytest.raises(sqlite3.OperationalError):
+        client.get("/settings/backup.riskid")
+    with pytest.raises(sqlite3.ProgrammingError, match="closed"):  # closed, not left open
+        opened[0].execute("SELECT 1")
+
+
 def test_settings_renders_for_an_empty_organisation(tmp_path):
     from riskid.store import init
     init(tmp_path / "e.riskid").close()

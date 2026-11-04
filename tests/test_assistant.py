@@ -119,6 +119,24 @@ def test_a_draft_carries_ai_draft_and_counts_as_very_low_until_a_person_accepts_
                                    "accepted": usecase["ai_draft"]["accepted_by"]}) == "Low"
 
 
+def test_a_returned_draft_is_resubmitted_not_accepted_twice(org, stub):
+    client, path = org
+    _switch_on(client, stub.endpoint)
+    stub.answers.append(Stub.answer(json.dumps(DRAFT)))
+    client.post("/usecases/draft", data={"system_id": "SYS-002"})
+    form = {"system_id": "SYS-002", "taxonomy": "2.3", "definition": DRAFT["definition"],
+            "drivers_direct": DRAFT["drivers_direct"], "data_quality": "Low"}      # no owner: returned
+    assert client.post("/usecases/UC-001", data=form).status_code == 422
+    first = _state(path)["usecase"]["UC-001"]
+    assert first["status"] == "returned" and first["ai_draft"]["accepted_by"] == "tester"
+    client.post("/usecases/UC-001", data=dict(form, owner="Head of Customer Service"))
+    with Store(path) as store:
+        reasons = [e["reason"] for e in store.events() if e["entity"] == "usecase"]
+    assert reasons[1].startswith("draft accepted and submitted; returned")
+    assert reasons[2].startswith("resubmitted after return; accepted")
+    assert _state(path)["usecase"]["UC-001"]["ai_draft"]["accepted_date"] == first["ai_draft"]["accepted_date"]
+
+
 def test_only_the_screens_fields_are_sent_and_the_request_is_logged(org, stub):
     client, path = org
     _switch_on(client, stub.endpoint)

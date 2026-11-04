@@ -73,8 +73,11 @@ def test_a_clause_with_no_live_line_on_the_system_is_not_a_gap(org):
 def test_the_list_shows_the_share_that_meets_the_clause_standard(org):
     client, _ = org
     client.post("/contracts/SYS-002", data={f"clause_{n}": "present" for n in range(1, 18)})
+    # SYS-003 has no live line, so a contract with every clause absent has nothing to be judged by.
+    client.post("/contracts/SYS-003", data={f"clause_{n}": "absent" for n in range(1, 18)})
     listing = client.get("/contracts").text
-    assert "1 of 3" in listing                                  # three bought systems, one with no gap
+    assert "1 of 3" in listing                                  # three bought systems, one meets it
+    assert "no live lines yet" in listing
 
 
 def test_refusals(org):
