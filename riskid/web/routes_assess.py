@@ -53,8 +53,8 @@ def _rows(state: dict) -> list:
             for line_id, (_, a) in sorted(latest_assessments(state).items()) if line_id in live]
 
 
-def _title(store: Store, line_id: str, line: dict) -> str:
-    library = library_lines(store)
+def _title(store: Store, line_id: str, line: dict, library=None) -> str:
+    library = library_lines(store) if library is None else library
     return library[line_id].title if line_id in library else (line.get("definition") or "")
 
 
@@ -76,9 +76,10 @@ async def assess_list(request: Request, store: Store = Depends(get_store)):
     latest = latest_assessments(state)
     lines = [(line_id, line, latest.get(line_id)) for line_id, line in
              sorted(state.get("register", {}).items()) if line.get("status") != "retired"]
+    library = library_lines(store)
     rows = _rows(state)
     return render_page(request, "assess_list.html", "assess", lines=lines,
-                       titles={i: _title(store, i, l) for i, l, _ in lines},
+                       titles={i: _title(store, i, l, library) for i, l, _ in lines},
                        cells={"inherent": placements(rows, "L", "I"),
                               "residual": placements(rows, "rL", "rI")},
                        band=rules.band, escalates=escalates)
@@ -104,7 +105,8 @@ async def assess_form(line_id: str, request: Request, store: Store = Depends(get
         values.update({k: a.get(k) for k in ("harm_scored", "unit_of_exposure", "likelihood",
                                             "vulnerability", "speed", "data_quality",
                                             "data_quality_basis", "dominant_reasoning",
-                                            "model_vendor_dependency")})
+                                            "model_vendor_dependency", "residual_L", "residual_I",
+                                            "acceptable", "acceptable_by")})
     return _form_page(request, store, line_id, line, values)
 
 

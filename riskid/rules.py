@@ -153,10 +153,10 @@ def residual_allowed(line_controls):
 
 
 def _passed_test(control) -> bool:
-    """A test date and a result that is not recorded as failed."""
+    """A test date and a result that is not recorded as a failure (fail, failed, failure)."""
     result = str(_field(control, "last_test_result") or "").strip()
     return bool(_field(control, "last_test_date")) and bool(result) and \
-        not result.lower().startswith("failed")
+        not result.lower().startswith("fail")
 
 
 def residual_basis_cites_test(basis, line_controls):

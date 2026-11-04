@@ -35,15 +35,12 @@ def _score(form, name, label, reasons):
 
 
 def _material_rule(inherent, impact, flags) -> str:
-    if inherent >= 15:
-        return "inherent 15 or more"
-    if impact == 5:
-        return "impact 5"
-    if flags.get("material_on_impact_alone"):
-        return flags["material_on_impact_alone"]
-    if flags.get("prohibited_practice"):
-        return "prohibited practice (Article 5)"
-    return "not material: inherent under 15 and impact under 5"
+    """Every rule that makes the line material, joined; or why it is not."""
+    found = [text for test, text in (
+        (inherent >= 15, "inherent 15 or more"), (impact == 5, "impact 5"),
+        (bool(flags.get("material_on_impact_alone")), flags.get("material_on_impact_alone")),
+        (bool(flags.get("prohibited_practice")), "prohibited practice (Article 5)")) if test]
+    return "; ".join(found) or "not material: inherent under 15 and impact under 5"
 
 
 def parse_assessment(form, line_id: str, controls: list, flags: dict, system: dict):

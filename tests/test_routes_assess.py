@@ -149,3 +149,24 @@ def test_assess_renders_for_an_empty_organisation(tmp_path):
     client = TestClient(create_app(tmp_path / "e.riskid", actor="t"), base_url=BASE)
     assert client.get("/assess").status_code == 200
     assert client.get("/assess/heatmap/inherent.png").status_code == 200
+
+
+def test_reassessing_starts_from_the_last_residual_and_acceptance(org):
+    client, _ = org
+    client.post("/assess/HUM-01/controls", data={"name": "Override-rate monitoring", "type": "detective"})
+    client.post("/assess/HUM-01/controls/CT-001/test",
+                data={"test_date": "2026-10-01", "outcome": "passed", "test_result": "4.1%"})
+    client.post("/assess/HUM-01", data=dict(FORM, residual_L="2", acceptable="yes", acceptable_by="CRO",
+                                            data_quality_basis="Override-rate monitoring 2026-10-01"))
+    form = client.get("/assess/HUM-01").text
+    assert '<option value="yes" selected>' in form and 'value="CRO"' in form
+    residual = form.split('name="residual_L"')[1].split("</select>")[0]
+    assert 'value="2" selected' in residual
+
+
+def test_material_rule_names_every_reason(org):
+    from riskid.assess import parse_assessment
+    from riskid import importers
+    high = dict(FORM, likelihood="4", impact_IND="5")
+    a, _, _ = parse_assessment(high, "LEG-08", [], importers.load_flags(), {})
+    assert a.material_rule == "inherent 15 or more; impact 5; LEG-08: material on impact alone"

@@ -114,6 +114,8 @@ def test_residual_allowed_negative():
     # A failed test does not unlock the residual (chapter 9: "until it passes a test").
     assert residual_allowed([{"last_test_date": "2026-03-31",
                               "last_test_result": "failed: reviewers missed 3 of 5 seeded errors"}]) is False
+    for result in ("failure: 3 of 5 missed", "FAIL: regression", "Fail"):
+        assert residual_allowed([{"last_test_date": "2026-03-31", "last_test_result": result}]) is False
 
 
 # --- check_use_case (SPEC.md 5.5) -----------------------------------------
