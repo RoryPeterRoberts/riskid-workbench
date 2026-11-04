@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<table class="grid">
+  <thead><tr><th>Line</th><th>Risk</th><th>System</th><th>Inherent</th><th>Band</th><th>Material</th><th>Residual</th><th>Data quality</th><th></th></tr></thead>
+  <tbody>
+  {% for line_id, line, latest in lines %}{% set a = latest[1] if latest else none %}
+    <tr>
+      <td><a href="/assess/{{ line_id }}">{{ line_id }}</a></td>
+      <td>{{ titles[line_id] }}<br><small>{{ line.status }}, {{ line.source }}</small></td>
+      <td>{{ line.system_id }}</td>
+      {% if a %}
+      <td>{{ a.inherent }}</td><td>{{ a.inherent_band }}</td>
+      <td>{% if a.material %}<strong>material</strong>{% else %}not material{% endif %}<br><small>{{ a.material_rule }}</small></td>
+      <td>{{ a.residual }} <small>{{ band(a.residual) }}</small></td><td>{{ a.data_quality }}</td>
+      <td>{% if escalates(a) %}<span class="flag">in front of the owner this week</span>{% endif %}<a href="/assess/{{ line_id }}/record">B.6 record</a></td>
+      {% else %}
+      <td colspan="5" class="empty">not assessed</td><td><a href="/assess/{{ line_id }}">Assess</a></td>
+      {% endif %}
+    </tr>
+  {% else %}
+    <tr><td colspan="9" class="empty">No lines in the register yet: adopt them from the Library, or they arrive from use cases and workshops.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% for kind in ("inherent", "residual") %}
+<h2>{{ kind|capitalize }} heat map</h2>
+<img class="heatmap" src="/assess/heatmap/{{ kind }}.png" alt="{{ kind|capitalize }} heat map: likelihood against impact, with the line IDs in each cell">
+<table class="grid cells" id="cells-{{ kind }}">
+  <caption>The same map as text: impact down the side, likelihood along the top.</caption>
+  <thead><tr><th>Impact</th>{% for l in range(1, 6) %}<th>L{{ l }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for i in range(5, 0, -1) %}<tr><th>I{{ i }}</th>{% for l in range(1, 6) %}<td data-cell="{{ l }},{{ i }}" class="band-{{ band(l * i)|lower }}">{{ cells[kind].get((l, i), [])|join(", ") }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+</table>
+{% endfor %}
+{% endblock %}

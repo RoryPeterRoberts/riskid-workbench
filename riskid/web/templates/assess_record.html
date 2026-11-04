@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block heading %}{{ line_id }}: assessment record {{ as_id }}{% endblock %}
+{% block content %}
+<p>{{ title }} · {{ line.system_id }} · assessed {{ a.date }} by {{ a.assessor }} · <a href="/assess/{{ line_id }}">Assess again</a></p>
+<dl class="record b6">
+  <dt>1. Inherent risk score</dt>
+  <dd>{{ a.harm_scored or "harm not stated" }}{% if a.unit_of_exposure %}, per {{ a.unit_of_exposure }}{% endif %}.<br>
+    Impact: {% for d, v in a.impact.items() %}{{ d }} {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}; dominant {{ a.dominant_dimension }}{% if a.dominant_reasoning %} ({{ a.dominant_reasoning }}){% endif %}.<br>
+    Likelihood {{ a.likelihood }} × impact {{ a.impact[a.dominant_dimension] }} = <strong>{{ a.inherent }}</strong>, {{ a.inherent_band }}. Vulnerability {{ a.vulnerability }}, speed of onset {{ a.speed }}.{% if escalates %} <span class="flag">in front of the owner this week</span>{% endif %}</dd>
+  <dt>2. Control effectiveness</dt>
+  <dd>{% for c in controls %}<div>{{ c.name }} ({{ c.type }}): {% if c.last_test_date %}tested {{ c.last_test_date }}, {{ c.last_test_result }}{% else %}untested{% endif %}{% if c.evidence_ref %}; evidence {{ c.evidence_ref }}{% endif %}</div>{% else %}No controls listed.{% endfor %}</dd>
+  <dt>3. Residual risk score</dt>
+  <dd>Likelihood {{ a.residual_L }} × impact {{ a.residual_I }} = <strong>{{ a.residual }}</strong>{% if residual_band %}, {{ residual_band }}{% endif %}.{% if a.acceptable %} Acceptable: {{ a.acceptable }}{% if a.acceptable_by %}, by {{ a.acceptable_by }}{% endif %}.{% else %} Acceptability not yet decided.{% endif %}</dd>
+  <dt>4. Data quality rating</dt>
+  <dd>{{ a.data_quality }}: {{ a.data_quality_basis }}</dd>
+  <dt>5. Materiality</dt>
+  <dd>{% if a.material %}<strong>Material</strong>{% else %}Not material{% endif %}: {{ a.material_rule }}</dd>
+  <dt>6. Model and vendor dependency</dt>
+  <dd>{{ a.model_vendor_dependency or "None recorded." }}</dd>
+  <dt>7. Disagreement record</dt>
+  <dd>{% if a.disagreement %}{{ a.disagreement.holder }}: minority score {{ a.disagreement.minority_score }} on {{ a.disagreement.dimension }}{% if a.disagreement.majority_score %} against {{ a.disagreement.majority_score }}{% endif %}{% if a.disagreement.evidence %}; evidence {{ a.disagreement.evidence }}{% endif %}. In the disagreement log.{% else %}None recorded.{% endif %}</dd>
+</dl>
+{% endblock %}

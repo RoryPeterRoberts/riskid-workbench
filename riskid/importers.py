@@ -94,3 +94,10 @@ def load_swift() -> list[dict]:
 
     data = json.loads((DATA_DIR / "swift.json").read_text(encoding="utf-8"))
     return data["prompts"]
+
+
+def load_flags() -> dict:
+    """Load the library's rule flags (``flags.json``): which lines carry which flag."""
+    import json
+
+    return json.loads((DATA_DIR / "flags.json").read_text(encoding="utf-8"))

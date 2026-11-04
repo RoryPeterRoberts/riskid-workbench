@@ -44,3 +44,7 @@ One line each (`PLAN.md` rule 11).
   owner is set elsewhere.
 - round 8: an escalated line has no "principal" flag on the register line;
   the resolution records the escalation.
+- round 9: chapter 9's rule that lines sharing a cause are tested together
+  (their sum can be material when no part is) is not applied.
+- round 9: the controls listed in an accepted use case could be offered as the
+  line's controls on the Assess screen.

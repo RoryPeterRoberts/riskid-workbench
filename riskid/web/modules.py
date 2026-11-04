@@ -88,7 +88,20 @@ MODULES = {
               "transferred about US$25 million after a video call with deepfakes of colleagues; "
               "each function's answer on who owned the risk stopped at its own edge (SOC-02)."),
     ),
+    "assess": Module(
+        key="assess",
+        title="Assess",
+        path="/assess",
+        chapter=9,
+        chapter_title="Assessment: Four-Dimensional Scoring, Harm to Individuals and Data Quality",
+        template="B.6 The Seven-Field Assessment Record",
+        why=("A control that has not been tested reduces nothing, and until it passes a test "
+             "the residual stays at the inherent score."),
+        case=("The Algorithm Behind the A-Level Grades: in August 2020 Ofqual's standardisation "
+              "model lowered about 39% of teacher-assessed grades in England; it was measured on "
+              "the cohort, and the harm fell on individual students."),
+    ),
 }
 
 # The modules in the navigation bar, in the method's order.
-NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile"))
+NAV = tuple(MODULES[k] for k in ("inventory", "library", "workshop", "usecases", "reconcile", "assess"))

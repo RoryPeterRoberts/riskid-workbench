@@ -140,3 +140,11 @@ label.check { display: block; font-weight: 400; }
 /* Reconcile (round 8) */
 nav.tabs { display: flex; gap: 0.25rem; margin: 0 0 1rem; }
 nav.tabs a { background: var(--card); border: 1px solid var(--rule); border-bottom: 3px solid var(--gold); padding: 0.35rem 0.9rem; text-decoration: none; font-weight: 600; }
+
+/* Assess (round 9) */
+img.heatmap { max-width: 100%; background: #fff; border: 1px solid var(--rule); }
+table.cells td { min-width: 5rem; font-size: 0.85rem; }
+table.cells caption { caption-side: top; text-align: left; color: var(--muted); font-size: 0.85rem; }
+.band-low { background: #c6e0b4; } .band-moderate { background: #ffe699; }
+.band-high { background: #f4b183; } .band-critical { background: #ff7c80; }
+dl.b6 dt { color: var(--navy); }

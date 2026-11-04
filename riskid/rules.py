@@ -144,13 +144,33 @@ def residual_allowed(line_controls):
 
     ``rL`` and ``rI`` stay locked at ``L`` and ``I`` until at least one
     control on the line has both a test date and a test result; only then can
-    a lower residual be entered. ``line_controls`` is a list of control
-    records (dicts or :class:`~riskid.model.Control`).
+    a lower residual be entered. A result recorded as failed does not count:
+    "until it passes a test the residual stays at the inherent score"
+    (chapter 9). ``line_controls`` is a list of control records (dicts or
+    :class:`~riskid.model.Control`).
     """
+    return any(_passed_test(control) for control in line_controls or [])
+
+
+def _passed_test(control) -> bool:
+    """A test date and a result that is not recorded as a failure (fail, failed, failure)."""
+    result = str(_field(control, "last_test_result") or "").strip()
+    return bool(_field(control, "last_test_date")) and bool(result) and \
+        not result.lower().startswith("fail")
+
+
+def residual_basis_cites_test(basis, line_controls):
+    """Whether a lowered residual's data-quality basis cites the control test (SPEC.md 5.4).
+
+    "The data quality basis must then cite that test": the basis names a
+    control that has a test date and a result, or gives that test's date.
+    """
+    text = (basis or "").lower()
     for control in line_controls or []:
-        has_date = bool(_field(control, "last_test_date"))
-        has_result = bool(_field(control, "last_test_result"))
-        if has_date and has_result:
+        if not _passed_test(control):
+            continue
+        name = (_field(control, "name") or "").strip().lower()
+        if (name and name in text) or str(_field(control, "last_test_date")) in text:
             return True
     return False
 

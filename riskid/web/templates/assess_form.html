@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block heading %}Assess {{ line_id }}: {{ title }}{% endblock %}
+{% block content %}
+{% macro picker(name, scale, value) %}
+<select name="{{ name }}"><option value="">Choose</option>{% for level in scale.levels %}<option value="{{ level.score }}"{% if value|string == level.score|string %} selected{% endif %}>{{ level.score }} {{ level.rating }}: {{ level.description }}</option>{% endfor %}</select>
+{% endmacro %}
+{% if reasons %}<div class="returned" role="alert"><p>Not saved:</p><ul class="reasons">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+<p>{{ line.system_id }} · {{ line.status }} · {{ line.source }}{% if history %} · {{ history|length }} {{ "assessment" if history|length == 1 else "assessments" }} on record, latest <a href="/assess/{{ line_id }}/record">{{ history[-1][0] }}</a>; the form starts from it{% endif %}</p>
+<form method="post" action="/assess/{{ line_id }}" class="b1">
+  <fieldset class="b1-row">
+    <h3>The harm scored</h3>
+    <label class="field"><span>Harm scored</span><input name="harm_scored" value="{{ values.get('harm_scored') or '' }}"></label>
+    <label class="field"><span>Unit of exposure</span><input name="unit_of_exposure" value="{{ values.get('unit_of_exposure') or '' }}"></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Impact on the five dimensions</h3>
+    <p class="why-row">The highest sets the score; the dominant dimension is named. When harm to individuals scores 4 or 5 and is not dominant, give the reasoning.</p>
+    {% for d in dims %}<label class="field"><span>{{ scales[d].name }}</span>{{ picker("impact_" ~ d, scales[d], values.get("impact_" ~ d)) }}</label>{% endfor %}
+    <label class="field"><span>Reasoning for the dominant dimension</span><textarea name="dominant_reasoning" rows="2">{{ values.get('dominant_reasoning') or '' }}</textarea></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Likelihood, vulnerability and speed of onset</h3>
+    <label class="field"><span>Likelihood (12-month horizon)</span>{{ picker("likelihood", scales.likelihood, values.get("likelihood")) }}</label>
+    <label class="field"><span>Vulnerability</span>{{ picker("vulnerability", scales.vulnerability, values.get("vulnerability")) }}</label>
+    <label class="field"><span>Speed of onset</span>{{ picker("speed", scales.speed, values.get("speed")) }}<small>A vulnerability or a speed of 5 puts the line in front of the owner this week, whatever its score.</small></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Data quality</h3>
+    <label class="field"><span>Rating</span><select name="data_quality"><option value="">Choose</option>{% for level in scales.data_quality.levels %}<option value="{{ level.rating }}"{% if values.get('data_quality') == level.rating %} selected{% endif %}>{{ level.rating }}: {{ level.basis }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Basis: the evidence behind the rating</span><textarea name="data_quality_basis" rows="2">{{ values.get('data_quality_basis') or '' }}</textarea><small>A supplier's evaluation of an earlier version is not High. A lower residual must cite the control test.</small></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Residual</h3>
+    {% if unlocked %}
+    <p class="why-row">A control on this line has a test date and a result, so the residual can be lowered; the basis above must cite that test.</p>
+    <label class="field"><span>Residual likelihood</span>{{ picker("residual_L", scales.likelihood, values.get("residual_L")) }}</label>
+    <label class="field"><span>Residual impact</span>{{ picker("residual_I", scales.FIN, values.get("residual_I")) }}</label>
+    {% else %}
+    <p class="returned">The residual is locked at the inherent likelihood and impact: no control on this line has a test date and a result yet (SPEC 5.4; chapter 9).</p>
+    <label class="field"><span>Residual likelihood</span><select name="residual_L" disabled><option>same as inherent</option></select></label>
+    <label class="field"><span>Residual impact</span><select name="residual_I" disabled><option>same as inherent</option></select></label>
+    {% endif %}
+    <label class="field"><span>Is the residual risk acceptable under the risk criteria?</span><select name="acceptable"><option value="">Not decided</option><option value="yes"{% if values.get('acceptable') == 'yes' %} selected{% endif %}>Yes</option><option value="no"{% if values.get('acceptable') == 'no' %} selected{% endif %}>No</option></select></label>
+    <label class="field"><span>Accepted by</span><input name="acceptable_by" value="{{ values.get('acceptable_by') or '' }}"><small>Article 9(5); ISO/IEC 42001 clause 6.1.3.</small></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Model and vendor dependency</h3>
+    <label class="field"><span>Where a model or vendor evaluation informs the score: its assumptions, its limits, and who outside the building team challenged it</span><textarea name="model_vendor_dependency" rows="2">{{ values.get('model_vendor_dependency') or '' }}</textarea></label>
+  </fieldset>
+  <fieldset class="b1-row">
+    <h3>Disagreement</h3>
+    <p class="why-row">A minority score is kept, not averaged; it goes to the disagreement log. Earlier minority views are already there, so they are not carried into a new assessment.</p>
+    <label class="field"><span>Held by</span><input name="minority_holder"></label>
+    <label class="field"><span>Minority score</span><input name="minority_score" inputmode="numeric"></label>
+    <label class="field"><span>Dimension</span><select name="minority_dimension"><option value=""></option>{% for d in dimensions %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Evidence</span><input name="minority_evidence"></label>
+  </fieldset>
+  <p class="actions"><button type="submit">Save the assessment</button> <a href="/assess">All lines</a></p>
+</form>
+
+<section class="stage" id="controls">
+  <h2>Controls on {{ line_id }}</h2>
+  <table class="grid">
+    <thead><tr><th>ID</th><th>Control</th><th>Type</th><th>Owner</th><th>Last test</th><th>Result</th><th>Evidence</th><th>Annex A</th><th>Record a test</th></tr></thead>
+    <tbody>{% for c in controls %}<tr><td>{{ c.id }}</td><td>{{ c.name }}</td><td>{{ c.type }}</td><td>{{ c.owner or "" }}</td><td>{{ c.last_test_date or "untested" }}</td><td>{{ c.last_test_result or "" }}</td><td>{{ c.evidence_ref or "" }}</td><td>{{ c.annex_a_ref or "" }}</td>
+      <td><form method="post" action="/assess/{{ line_id }}/controls/{{ c.id }}/test" class="inline"><input type="date" name="test_date"><select name="outcome"><option value="">Outcome</option><option value="passed">passed</option><option value="failed">failed</option></select><input name="test_result" placeholder="overrides 4.1% of decisions"><button type="submit">Record</button></form></td></tr>
+    {% else %}<tr><td colspan="9" class="empty">No controls listed. A control that has not been tested reduces nothing.</td></tr>{% endfor %}</tbody>
+  </table>
+  <form method="post" action="/assess/{{ line_id }}/controls" class="inline">
+    <label>Control <input name="name" placeholder="Blind re-checks"></label>
+    <label>Type <select name="type">{% for t in control_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}</select></label>
+    <label>Owner <input name="owner"></label>
+    <label>Evidence <input name="evidence_ref"></label>
+    <label>Annex A <input name="annex_a_ref" size="8" placeholder="A.9.3"></label>
+    <button type="submit">Add</button>
+  </form>
+</section>
+{% endblock %}
